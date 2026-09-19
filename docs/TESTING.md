@@ -67,7 +67,15 @@ No sanitized probe report, exact text comparison, or individual edge-case result
 
 Continuing the Firefox-only test round, the maintainer reported that the script was fully tested and working under Tampermonkey, with no issues to report. The supplied dashboard screenshot confirms **Tampermonkey 5.5.0**, **Proxmox Copy Console 0.4.0-dev.2**, and an enabled script. Firefox 156.0 (64-bit) and Proxmox VE 9.2.3 are carried forward from the previously supplied environment screenshots; they are not independently visible in this dashboard image.
 
-Record this as a successful maintainer-reported Tampermonkey test, alongside the Violentmonkey workflow pass. The coding agent did not operate the browser or independently observe this run. Individual scenario results and probe output were not supplied, so no additional per-scenario observations are inferred. Chrome and the other Firefox managers remain untested in this record.
+Record this as a successful maintainer-reported Tampermonkey test, alongside the Violentmonkey workflow pass. The coding agent did not operate the browser or independently observe this run. Individual scenario results and probe output were not supplied, so no additional per-scenario observations are inferred. Chrome remains untested; subsequent manager attempts are recorded separately below.
+
+### FireMonkey attempt — 2026-09-19
+
+The maintainer reports that FireMonkey does not seem to work, while noting uncertainty about manager setup. The supplied changelog identifies version **3.8**; the popup screenshot does not independently show the manager or installed script version. It shows Proxmox Copy Console under **Other Scripts**, with **Tab Scripts** empty. The background appears to be a script-manager dashboard; the active tab's URL is not established by this image. Record this as an unresolved activation/test attempt, not a confirmed runtime or clipboard defect.
+
+Next check: enable the saved script in FireMonkey, disable other managers' copies for the site, open the actual HTTPS port-8006 Proxmox node Shell or LXC Console, and reload the page. Inspect the popup there. If the script remains absent from Tab Scripts, check effective host rules and its Information/Log registration errors before testing clipboard behavior. If it appears but Copy is missing or fails, collect the existing manager/structure probes and the exact symptom.
+
+[FireMonkey's help](https://erosman.github.io/firemonkey/src/content/help.html) describes Tab Scripts as the active-tab list and provides registration errors in script Information. Its manual Run action does not process userscript metadata or supply GM APIs; use normal saved-script activation for this test. No source change or compatibility variant is justified by the evidence so far.
 
 ## Remaining live acceptance plan
 
