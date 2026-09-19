@@ -1,0 +1,36 @@
+{
+    "revision": "27a83d2ac836ef35c2f7e6644b6e448355631be0",
+    "version": "0.3.0",
+    "cases": [
+        {
+            "name": "wrapped interior spaces",
+            "rows": [{ "text": "abc  " }, { "text": "def  ", "wrapped": true }],
+            "baseline": "abc  def",
+            "current": "abc  def"
+        },
+        {
+            "name": "interior blanks and viewport padding",
+            "rows": [{ "text": "first " }, { "text": "   " }, { "text": "last " }, { "text": "   " }],
+            "baseline": "first\n\nlast",
+            "current": "first\n\nlast"
+        },
+        {
+            "name": "retained first row is already wrapped",
+            "rows": [{ "text": "fragment", "wrapped": true }, { "text": "end" }],
+            "baseline": "fragment\nend",
+            "current": "fragment\nend"
+        },
+        {
+            "name": "missing interior row",
+            "rows": [{ "text": "first" }, null, { "text": "last" }],
+            "baseline": "first\n\nlast",
+            "current": "first\n\nlast"
+        },
+        {
+            "name": "intentional change: preserve nonbreaking space",
+            "rows": [{ "text": "value\u00a0  " }],
+            "baseline": "value",
+            "current": "value\u00a0"
+        }
+    ]
+}

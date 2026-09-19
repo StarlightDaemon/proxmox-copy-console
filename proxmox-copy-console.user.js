@@ -1,601 +1,384 @@
 // ==UserScript==
 // @name         Proxmox Copy Console
 // @namespace    homelab
-// @version      0.3.0
-// @description  Adds a native Copy button to Proxmox xterm consoles and copies the full retained terminal buffer.
-// @include      /^https\://[^/]+:8006/.*$/
+// @version      0.4.0-dev.2
+// @description  Copies the retained buffer of an embedded Proxmox xterm console. Unreleased development build.
+// @include      https://*:8006/*
 // @grant        GM_setClipboard
+// @grant        GM_info
+// @grant        GM.setClipboard
+// @grant        GM.info
 // @grant        unsafeWindow
+// @license      MIT
+// @homepageURL  https://github.com/StarlightDaemon/proxmox-copy-console
+// @supportURL   https://github.com/StarlightDaemon/proxmox-copy-console/issues
 // @run-at       document-idle
 // @noframes
 // ==/UserScript==
 
 (() => {
-'use strict';
+    'use strict';
 
-const TAG = '[PVE Copy Console]';
+    const TAG = '[PVE Copy Console]';
+    const SCAN_INTERVAL_MS = 500;
+    const FEEDBACK_DURATION_MS = 1500;
+    const CLIPBOARD_TIMEOUT_MS = 5000;
+    const COPY_ICON = 'fa fa-copy';
+    const COPY_TOOLTIP = 'Copy the full retained console buffer to the clipboard';
+    const UNAVAILABLE = 'Console unavailable or ambiguous';
+    const controls = new Map();
+    let clipboardPending = false;
+    let lastWarning = -Infinity;
 
-const SCAN_INTERVAL_MS = 500;
-const FEEDBACK_DURATION_MS = 1000;
+    // Include globs vary between managers; validate the actual URL as well.
+    if (window.top !== window.self || location.protocol !== 'https:' || location.port !== '8006') return;
+    const page = typeof unsafeWindow !== 'undefined' ? unsafeWindow : (window.wrappedJSObject || window);
 
-/*
- * This script runs only in the main Proxmox UI.
- * The xterm iframe is accessed from the parent page.
- */
-if (window.top !== window.self) {
-    return;
-}
-
-function log(...args) {
-    console.log(TAG, ...args);
-}
-
-function warn(...args) {
-    console.warn(TAG, ...args);
-}
-
-function isVisibleElement(element) {
-    if (!element) {
-        return false;
-    }
-
-    const rect = element.getBoundingClientRect();
-
-    if (rect.width <= 0 || rect.height <= 0) {
-        return false;
-    }
-
-    const style = getComputedStyle(element);
-
-    return (
-        style.display !== 'none' &&
-        style.visibility !== 'hidden'
-    );
-}
-
-/*
- * Firefox/userscript managers can expose same-origin iframe globals
- * either directly or through wrappedJSObject.
- */
-function getTerminalFromFrame(frame) {
-    try {
-        const candidate = frame.contentWindow?.term;
-
-        if (
-            candidate &&
-            candidate.buffer &&
-            typeof candidate.buffer === 'object'
-        ) {
-            return candidate;
-        }
-    } catch {
-        // Try Firefox's wrapped object below.
-    }
-
-    try {
-        const candidate =
-            frame.contentWindow?.wrappedJSObject?.term;
-
-        if (
-            candidate &&
-            candidate.buffer &&
-            typeof candidate.buffer === 'object'
-        ) {
-            return candidate;
-        }
-    } catch {
-        // Not an accessible xterm frame.
-    }
-
-    return null;
-}
-
-/*
- * Find the currently visible Proxmox xterm console.
- *
- * This is intentionally resolved fresh whenever needed so navigation,
- * reconnects, and recreated xterm instances do not leave us holding a
- * stale Terminal object.
- */
-function findVisibleTerminal() {
-    const frames = [
-        ...document.querySelectorAll('iframe')
-    ];
-
-    /*
-     * First pass:
-     * prefer visible frames whose URL explicitly looks console-related.
-     */
-    for (const frame of frames) {
-        if (!isVisibleElement(frame)) {
-            continue;
-        }
-
-        const src = frame.getAttribute('src') || '';
-
-        if (
-            !src.includes('xtermjs=1') &&
-            !src.includes('console=')
-        ) {
-            continue;
-        }
-
-        const term = getTerminalFromFrame(frame);
-
-        if (term) {
-            return {
-                term,
-                frame
-            };
-        }
-    }
-
-    /*
-     * Fallback:
-     * tolerate future Proxmox URL/markup changes by checking every
-     * visible same-origin iframe for an exposed xterm instance.
-     */
-    for (const frame of frames) {
-        if (!isVisibleElement(frame)) {
-            continue;
-        }
-
-        const term = getTerminalFromFrame(frame);
-
-        if (term) {
-            return {
-                term,
-                frame
-            };
-        }
-    }
-
-    return null;
-}
-
-/*
- * Convert xterm physical buffer rows into logical text lines.
- *
- * xterm represents long wrapped output as multiple physical rows.
- * Rows marked isWrapped belong to the previous logical line and should
- * not introduce an artificial newline in the copied text.
- */
-function extractBuffer(buffer) {
-    if (
-        !buffer ||
-        typeof buffer.getLine !== 'function'
-    ) {
-        return null;
-    }
-
-    const lines = [];
-
-    let logicalLine = null;
-
-    function finishLogicalLine() {
-        if (logicalLine === null) {
-            return;
-        }
-
-        /*
-         * Remove terminal padding at the end of the completed logical
-         * line, while preserving spaces encountered inside wrapped rows.
-         */
-        lines.push(
-            logicalLine.replace(/\s+$/u, '')
-        );
-
-        logicalLine = null;
-    }
-
-    for (let y = 0; y < buffer.length; y++) {
-        const line = buffer.getLine(y);
-
-        if (!line) {
-            finishLogicalLine();
-
-            lines.push('');
-            continue;
-        }
-
-        /*
-         * Keep the entire physical terminal row while reconstructing
-         * wrapped logical lines. Right-side cleanup happens only after
-         * the complete logical line has been assembled.
-         */
-        const text = line.translateToString(false);
-
-        if (
-            line.isWrapped &&
-            logicalLine !== null
-        ) {
-            logicalLine += text;
-        } else {
-            finishLogicalLine();
-
-            logicalLine = text;
-        }
-    }
-
-    finishLogicalLine();
-
-    /*
-     * The terminal viewport often contains blank rows below the current
-     * prompt. Strip only those trailing empty logical rows.
-     *
-     * Blank lines within actual console output remain intact.
-     */
-    while (
-        lines.length > 0 &&
-        lines[lines.length - 1] === ''
-    ) {
-        lines.pop();
-    }
-
-    return {
-        text: lines.join('\n'),
-        logicalLines: lines.length,
-        physicalLines: buffer.length
-    };
-}
-
-/*
- * Select the appropriate xterm buffer.
- *
- * Normal shell operation:
- * use the normal buffer because it contains retained scrollback.
- *
- * Alternate-screen applications such as top/nano/less:
- * use the active alternate buffer because that represents the screen
- * currently displayed to the user.
- */
-function extractFullConsole(term) {
-    if (!term?.buffer) {
-        return null;
-    }
-
-    const isAlternate =
-        term.buffer.active === term.buffer.alternate;
-
-    const buffer = isAlternate
-        ? term.buffer.active
-        : (term.buffer.normal || term.buffer.active);
-
-    const result = extractBuffer(buffer);
-
-    if (!result) {
-        return null;
-    }
-
-    return {
-        ...result,
-        alternateScreen: isAlternate
-    };
-}
-
-function copyConsole() {
-    const active = findVisibleTerminal();
-
-    if (!active) {
-        warn('No active Proxmox xterm console found');
-
-        return {
-            ok: false,
-            message: 'No xterm console is active'
-        };
-    }
-
-    const result = extractFullConsole(active.term);
-
-    if (!result?.text) {
-        warn('Terminal buffer is empty or unavailable');
-
-        return {
-            ok: false,
-            message: 'Console buffer is empty'
-        };
-    }
-
-    try {
-        /*
-         * Leave the clipboard type unspecified for compatibility across
-         * current userscript managers.
-         */
-        GM_setClipboard(result.text);
-
-        log(
-            `Copied ${result.text.length} characters`,
-            `logicalLines=${result.logicalLines}`,
-            `bufferRows=${result.physicalLines}`,
-            `alternate=${result.alternateScreen}`
-        );
-
-        return {
-            ok: true,
-            message:
-                `Copied ${result.logicalLines} lines`
-        };
-    } catch (err) {
-        console.error(
-            TAG,
-            'Clipboard write failed:',
-            err
-        );
-
-        return {
-            ok: false,
-            message: 'Clipboard write failed'
-        };
-    }
-}
-
-function getButtonText(button) {
-    try {
-        if (typeof button.getText === 'function') {
-            return String(
-                button.getText() || ''
-            ).trim();
-        }
-
-        return String(
-            button.text || ''
-        ).trim();
-    } catch {
-        return '';
-    }
-}
-
-/*
- * Locate the visible native Proxmox toolbar control that should precede
- * our Copy button.
- *
- * Node:
- *     Shell -> Copy
- *
- * LXC:
- *     Console -> Copy
- */
-function findConsoleAnchor(Ext) {
-    const components =
-        Ext.ComponentQuery.query('button');
-
-    const preferredLabels = [
-        'Shell',
-        'Console'
-    ];
-
-    for (const label of preferredLabels) {
-        for (const component of components) {
-            if (
-                !component ||
-                component.destroyed ||
-                getButtonText(component) !== label
-            ) {
-                continue;
+    function pageOptions(options) {
+        if (typeof cloneInto !== 'function') return options;
+        const shared = { ...options };
+        for (const key of Object.keys(shared)) {
+            if (typeof shared[key] === 'function') {
+                // These callbacks take no page arguments and return no sandbox
+                // objects (including privileged promises) to the page.
+                shared[key] = () => { void options[key](); };
             }
+        }
+        return cloneInto(shared, page, { cloneFunctions: true });
+    }
 
+    // Restrict installation to trusted hosts in the userscript manager. Page
+    // globals are integration points, not authentication or a security boundary.
+    function warnInstall() {
+        if (Date.now() - lastWarning >= 30000) {
+            console.warn(TAG, 'Console integration unavailable; retrying automatically');
+            lastWarning = Date.now();
+        }
+    }
+
+    function isVisibleElement(element) {
+        if (!element?.isConnected) return false;
+        const rect = element.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return false;
+        const style = getComputedStyle(element);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+    }
+
+    // Firefox may expose iframe globals directly or through wrappedJSObject.
+    function getTerminalFromFrame(frame) {
+        for (const wrapped of [false, true]) {
             try {
-                if (
-                    typeof component.isVisible === 'function' &&
-                    !component.isVisible(true)
-                ) {
-                    continue;
-                }
+                const win = frame.contentWindow;
+                const term = (wrapped ? win?.wrappedJSObject : win)?.term;
+                if (term?.buffer && typeof term.buffer === 'object') return term;
             } catch {
-                continue;
+                // Inaccessible, initializing, or disposed frame: try the next path.
             }
-
-            let toolbar = null;
-
-            try {
-                toolbar =
-                    component.up?.('toolbar') ||
-                    null;
-            } catch {
-                continue;
-            }
-
-            if (!toolbar) {
-                continue;
-            }
-
-            return {
-                anchor: component,
-                toolbar,
-                label
-            };
         }
+        return null;
     }
 
-    return null;
-}
-
-/*
- * Each ExtJS toolbar may own at most one injected Copy control.
- *
- * We deliberately do not use one global Ext component ID because
- * Proxmox can keep old/hidden toolbars around while navigating.
- */
-function toolbarAlreadyHasCopyButton(toolbar) {
-    const items =
-        toolbar?.items?.items || [];
-
-    return items.some(
-        item =>
-            item &&
-            !item.destroyed &&
-            item.pveCopyConsoleButton === true
-    );
-}
-
-/*
- * Give brief feedback without changing the button text.
- *
- * Keeping "Copy" stable prevents toolbar width/reflow changes.
- */
-function showFeedback(
-    button,
-    result
-) {
-    if (
-        !button ||
-        button.destroyed
-    ) {
-        return;
+    function consoleIdentity(anchor) {
+        if (!anchor || anchor.destroyed || !anchor.isVisible(true)) return null;
+        const type = anchor.consoleType;
+        if (!['shell', 'lxc'].includes(type) || !anchor.nodename) return null;
+        if (type === 'lxc' && !anchor.vmid) return null;
+        return { type, node: String(anchor.nodename), vmid: String(anchor.vmid) };
     }
 
-    const normalIcon =
-        'fa fa-copy';
-
-    const feedbackIcon =
-        result.ok
-            ? 'fa fa-check'
-            : 'fa fa-exclamation-triangle';
-
-    try {
-        button.setIconCls(feedbackIcon);
-        button.setTooltip(result.message);
-    } catch {
-        return;
-    }
-
-    setTimeout(() => {
-        if (
-            !button ||
-            button.destroyed
-        ) {
-            return;
-        }
-
+    function matchesIdentity(frame, identity) {
         try {
-            button.setIconCls(normalIcon);
-
-            button.setTooltip(
-                'Copy the full retained console buffer to the clipboard'
-            );
+            // Read the loaded URL, not a stale src attribute after migration/reload.
+            const url = new URL(frame.contentWindow.location.href);
+            const params = url.searchParams;
+            return url.origin === location.origin &&
+                params.get('xtermjs') === '1' &&
+                params.get('console') === identity.type &&
+                params.get('node') === identity.node &&
+                !params.has('remote') &&
+                (identity.type !== 'lxc' || params.get('vmid') === identity.vmid);
         } catch {
-            /*
-             * The toolbar may have been destroyed during navigation.
-             */
+            return false;
         }
-    }, FEEDBACK_DURATION_MS);
-}
-
-function installForCurrentConsole() {
-    /*
-     * Do not put a Copy button beside arbitrary controls named Console.
-     * Require an actual visible xterm terminal first.
-     */
-    if (!findVisibleTerminal()) {
-        return;
     }
 
-    let Ext;
-
-    try {
-        Ext = unsafeWindow.Ext;
-    } catch {
-        return;
+    function resolveConsole(anchor, anchors) {
+        if (document.hidden) return null;
+        const identity = consoleIdentity(anchor);
+        if (!identity) return null;
+        const toolbar = anchor.up('toolbar');
+        if (!toolbar?.items?.items.includes(anchor)) return null;
+        const candidates = anchors || page.Ext.ComponentQuery.query('pveConsoleButton');
+        if (candidates.filter(item => !item.destroyed && item.up('toolbar') === toolbar).length !== 1) return null;
+        const owner = toolbar?.ownerCt;
+        const root = owner?.getEl()?.dom;
+        if (!root || owner.destroyed || toolbar.destroyed) return null;
+        const matches = [];
+        for (const frame of root.querySelectorAll('iframe')) {
+            if (!isVisibleElement(frame) || !matchesIdentity(frame, identity)) continue;
+            matches.push(frame);
+        }
+        // Even an initializing second frame makes ownership ambiguous.
+        if (matches.length !== 1) return null;
+        const frame = matches[0];
+        const term = getTerminalFromFrame(frame);
+        return term ? { frame, term, toolbar } : null;
     }
 
-    if (
-        !Ext ||
-        !Ext.ComponentQuery ||
-        typeof Ext.create !== 'function'
-    ) {
-        return;
-    }
-
-    const context =
-        findConsoleAnchor(Ext);
-
-    if (!context) {
-        return;
-    }
-
-    const {
-        anchor,
-        toolbar,
-        label
-    } = context;
-
-    if (toolbarAlreadyHasCopyButton(toolbar)) {
-        return;
-    }
-
-    const items =
-        toolbar.items?.items || [];
-
-    const anchorIndex =
-        items.indexOf(anchor);
-
-    if (anchorIndex < 0) {
-        return;
-    }
-
-    /*
-     * Create a genuine ExtJS toolbar button so Proxmox owns its layout,
-     * dimensions, theme, hover state, and resize behavior.
-     */
-    const copyButton = Ext.create(
-        'Ext.button.Button',
-        {
-            text: 'Copy',
-
-            iconCls:
-                'fa fa-copy',
-
-            tooltip:
-                'Copy the full retained console buffer to the clipboard',
-
-            handler: function () {
-                const result =
-                    copyConsole();
-
-                showFeedback(
-                    copyButton,
-                    result
-                );
+    function extractBuffer(buffer, cols) {
+        if (!buffer || typeof buffer.getLine !== 'function' ||
+            !Number.isSafeInteger(buffer.length) || buffer.length < 0) return null;
+        const lines = [];
+        const length = buffer.length;
+        let logicalLine = null;
+        function finishLine() {
+            if (logicalLine === null) return;
+            // Preserve Unicode whitespace; terminal ASCII padding is intentionally
+            // trimmed only once the complete logical line has been reconstructed.
+            lines.push(logicalLine.replace(/ +$/u, ''));
+            logicalLine = null;
+        }
+        for (let y = 0; y < length; y++) {
+            const line = buffer.getLine(y);
+            if (!line) {
+                finishLine();
+                lines.push('');
+                continue;
+            }
+            let end = Number.isSafeInteger(cols) ? Math.min(cols, line.length) : line.length;
+            const next = buffer.getLine(y + 1);
+            // A wide glyph wrapping from the last column leaves an empty cell,
+            // not a literal space. Omit only that specific placeholder.
+            if (next?.isWrapped && end > 0 && line.getCell && next.getCell &&
+                line.getCell(end - 1)?.getChars() === '' &&
+                line.getCell(end - 1)?.getWidth() === 1 &&
+                next.getCell(0)?.getWidth() === 2) end--;
+            const text = line.translateToString(false, 0, end);
+            if (line.isWrapped && logicalLine !== null) logicalLine += text;
+            else {
+                finishLine();
+                logicalLine = text;
             }
         }
-    );
-
-    /*
-     * Private marker used only by this userscript.
-     */
-    copyButton.pveCopyConsoleButton = true;
-
-    toolbar.insert(
-        anchorIndex + 1,
-        copyButton
-    );
-
-    /*
-     * Ask ExtJS to recalculate the toolbar immediately.
-     */
-    try {
-        toolbar.updateLayout?.();
-    } catch {
-        /*
-         * ExtJS will also update naturally during its next layout pass.
-         */
+        finishLine();
+        while (lines.length && lines[lines.length - 1] === '') lines.pop();
+        return { text: lines.join('\n'), logicalLines: lines.length, physicalLines: length };
     }
 
-    log(
-        `Copy button installed after ${label}`
-    );
-}
+    function extractFullConsole(term) {
+        const buffers = term?.buffer;
+        if (!buffers) return null;
+        const alternateScreen = !!buffers.alternate && buffers.active === buffers.alternate;
+        const result = extractBuffer(alternateScreen ? buffers.active :
+            (buffers.normal || buffers.active), term.cols);
+        return result && { ...result, alternateScreen };
+    }
 
-/*
- * Proxmox creates, hides, destroys, and recreates ExtJS components while
- * navigating. Re-discovering the active console is intentionally cheap
- * and avoids coupling this userscript to private Proxmox router events.
- */
-setInterval(
-    installForCurrentConsole,
-    SCAN_INTERVAL_MS
-);
+    function writeClipboard(text) {
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const finish = (result, error) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                if (error) reject(error);
+                else resolve(result);
+            };
+            const timer = setTimeout(() => finish({ timedOut: true }), CLIPBOARD_TIMEOUT_MS);
+            try {
+                const legacy = typeof GM_setClipboard === 'function';
+                const modern = typeof GM !== 'undefined' ? GM : undefined;
+                const info = typeof GM_info !== 'undefined' ? GM_info : modern?.info;
+                const callbackSupported = legacy && info?.scriptHandler === 'Tampermonkey';
+                // Select by availability, never retry another API after a write.
+                // Preserve the modern method's receiver; not all GM.* calls
+                // return promises (Greasemonkey documents a void return here).
+                const written = legacy
+                    ? (callbackSupported
+                        ? GM_setClipboard(text, undefined, () => finish({ confirmed: true }))
+                        : GM_setClipboard(text))
+                    : modern.setClipboard(text);
+                if (written && typeof written.then === 'function') {
+                    Promise.resolve(written).then(
+                        () => finish({ confirmed: true }), error => finish(null, error));
+                } else if (!callbackSupported) {
+                    // A void return has no completion signal, for either API style.
+                    finish({ confirmed: false });
+                }
+            } catch (error) {
+                finish(null, error);
+            }
+        });
+    }
 
-installForCurrentConsole();
+    function updateAvailability(state, available) {
+        state.available = available;
+        const button = state.button;
+        if (button.destroyed) return;
+        // Keep the initiating button focusable while pending; the handler's
+        // global guard blocks repeat writes without losing keyboard focus.
+        button.setDisabled(!available || (clipboardPending && !state.busy));
+        if (!state.feedbackTimer && !state.busy) {
+            button.setTooltip(available ? COPY_TOOLTIP : UNAVAILABLE);
+        }
+    }
 
+    function feedback(state, message, icon) {
+        clearTimeout(state.feedbackTimer);
+        state.feedbackTimer = null;
+        if (state.button.destroyed) return;
+        state.button.setIconCls(icon);
+        state.button.setTooltip(message);
+        state.feedbackTimer = setTimeout(() => {
+            state.feedbackTimer = null;
+            if (state.button.destroyed) return;
+            try {
+                state.button.setIconCls(COPY_ICON);
+                state.button.setTooltip(state.available ? COPY_TOOLTIP : UNAVAILABLE);
+            } catch {
+                // ExtJS may have torn down the view during navigation.
+            }
+        }, FEEDBACK_DURATION_MS);
+    }
+
+    function restoreFocus(state, original, focusedElement) {
+        try {
+            const buttonElement = state.button.getEl()?.dom;
+            if (state.button.destroyed || !document.hasFocus() || document.hidden ||
+                !focusedElement || document.activeElement !== focusedElement ||
+                !buttonElement?.contains(focusedElement)) return;
+            const current = resolveConsole(state.anchor);
+            if (current?.frame === original.frame && current.term === original.term) {
+                current.term.focus?.();
+            }
+        } catch {
+            // Focus is a convenience; it must not turn a completed copy into an error.
+        }
+    }
+
+    async function copyConsole(state) {
+        if (clipboardPending || state.button.destroyed) return;
+        let failure = 'Console extraction failed';
+        try {
+            const current = resolveConsole(state.anchor);
+            if (!current || current.toolbar !== state.toolbar) {
+                updateAvailability(state, false);
+                feedback(state, UNAVAILABLE, 'fa fa-exclamation-triangle');
+                return;
+            }
+            const result = extractFullConsole(current.term);
+            if (!result || !result.text) {
+                feedback(state, result ? 'Console buffer is empty' : 'Console buffer unavailable',
+                    'fa fa-exclamation-triangle');
+                return;
+            }
+            const focusedElement = document.activeElement;
+            clipboardPending = true;
+            state.busy = true;
+            clearTimeout(state.feedbackTimer);
+            state.feedbackTimer = null;
+            for (const control of controls.values()) updateAvailability(control, control.available);
+            state.button.setIconCls('fa fa-spinner');
+            state.button.setTooltip('Copying console buffer');
+            failure = 'Clipboard write failed';
+            const status = await writeClipboard(result.text);
+            if (status.timedOut) {
+                feedback(state, 'Clipboard completion not confirmed; inspect clipboard before retrying',
+                    'fa fa-exclamation-triangle');
+            } else {
+                const scope = result.alternateScreen ? 'alternate screen' : 'retained buffer';
+                const message = status.confirmed
+                    ? `Copied ${result.logicalLines} lines (${scope})`
+                    : `Sent ${result.logicalLines} lines (${scope}); clipboard unconfirmed`;
+                feedback(state, message, status.confirmed ? 'fa fa-check' : 'fa fa-info-circle');
+                restoreFocus(state, current, focusedElement);
+            }
+        } catch {
+            // Never log terminal text or page-supplied exception messages.
+            try { feedback(state, failure, 'fa fa-exclamation-triangle'); } catch { /* Destroyed UI. */ }
+        } finally {
+            state.busy = false;
+            clipboardPending = false;
+            installForCurrentConsole();
+        }
+    }
+
+    function removeControl(state) {
+        clearTimeout(state.feedbackTimer);
+        state.feedbackTimer = null;
+        controls.delete(state.toolbar);
+        if (!state.button.destroyed) state.button.destroy();
+    }
+
+    function createControl(Ext, anchor, toolbar) {
+        const state = { anchor, toolbar, button: null, available: true, busy: false, feedbackTimer: null };
+        try {
+            state.button = Ext.create('Ext.button.Button', pageOptions({
+                text: 'Copy',
+                iconCls: COPY_ICON,
+                tooltip: COPY_TOOLTIP,
+                handler: () => copyConsole(state),
+            }));
+            state.button.pveCopyConsoleButton = true;
+            state.button.on('destroy', pageOptions({ handler: () => {
+                clearTimeout(state.feedbackTimer);
+                if (controls.get(toolbar) === state) controls.delete(toolbar);
+            } }).handler);
+            toolbar.insert(toolbar.items.items.indexOf(anchor) + 1, state.button);
+            controls.set(toolbar, state);
+            updateAvailability(state, true);
+        } catch (error) {
+            if (state.button) removeControl(state);
+            throw error;
+        }
+        // Native insertion owns layout. Some ExtJS versions expose an extra flush.
+        try { toolbar.updateLayout?.(); } catch { /* The next ExtJS layout pass recovers. */ }
+    }
+
+    function installForCurrentConsole() {
+        if (document.hidden) return;
+        try {
+            const Ext = page.Ext;
+            if (!page.PVE || !Ext?.ComponentQuery?.query || !Ext.create) return;
+            const anchors = Ext.ComponentQuery.query('pveConsoleButton');
+            const seen = new Set();
+            for (const anchor of anchors) {
+                let toolbar;
+                try {
+                    if (!consoleIdentity(anchor)) continue;
+                    toolbar = anchor.up('toolbar');
+                    if (!toolbar || toolbar.destroyed || !toolbar.items?.items.includes(anchor)) continue;
+                    seen.add(toolbar);
+                    let state = controls.get(toolbar);
+                    if (state && (state.anchor !== anchor || state.button.destroyed)) {
+                        removeControl(state);
+                        state = null;
+                    }
+                    const current = resolveConsole(anchor, anchors);
+                    if (state) updateAvailability(state, !!current);
+                    else if (current && !toolbar.items.items.some(item => !item.destroyed && item.pveCopyConsoleButton)) {
+                        createControl(Ext, anchor, toolbar);
+                    }
+                } catch {
+                    const state = controls.get(toolbar);
+                    if (state) updateAvailability(state, false);
+                    warnInstall();
+                }
+            }
+            for (const state of controls.values()) {
+                if (state.toolbar.destroyed || state.anchor.destroyed || state.button.destroyed) removeControl(state);
+                else if (!seen.has(state.toolbar)) updateAvailability(state, false);
+            }
+        } catch {
+            for (const state of controls.values()) {
+                try { updateAvailability(state, false); } catch { /* Destroyed UI. */ }
+            }
+            warnInstall();
+        }
+    }
+
+    // Periodic recovery avoids private router hooks and terminal-output observers.
+    setInterval(installForCurrentConsole, SCAN_INTERVAL_MS);
+    document.addEventListener('visibilitychange', installForCurrentConsole);
+    installForCurrentConsole();
 })();

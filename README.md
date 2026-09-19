@@ -1,128 +1,78 @@
 # Proxmox Copy Console
 
-[![Version](https://img.shields.io/badge/version-0.3.0-0969da)](CHANGELOG.md)
+[![Baseline](https://img.shields.io/badge/baseline-0.3.0-0969da)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-2da44e)](LICENSE)
-[![JavaScript](https://img.shields.io/badge/JavaScript-userscript-f7df1e)](proxmox-copy-console.user.js)
 
-A lightweight userscript that adds a native-looking **Copy** button to Proxmox xterm consoles and copies the **full retained terminal buffer**—including scrollback—not just the visible viewport.
+A lightweight userscript that adds a native **Copy** button to embedded Proxmox node Shell and LXC xterm consoles. It copies the **full retained terminal buffer**, including scrollback, with wrapped rows reconstructed into logical lines.
 
-> **Current baseline:** 0.3.0 (pre-1.0).  
-> **Next version:** 0.4.0 is planned and unreleased.
+> **Development source: 0.4.0-dev.2 — unreleased, pending live acceptance.**
+> The documented 0.3.0 baseline is preserved at [commit 27a83d2](https://github.com/StarlightDaemon/proxmox-copy-console/blob/27a83d2ac836ef35c2f7e6644b6e448355631be0/proxmox-copy-console.user.js). Local automated results do not establish a tested Proxmox/browser/userscript-manager combination.
 
-## Highlights
+## What it does
 
-- **Native Proxmox integration** — inserts a real ExtJS `Copy` button into the existing console toolbar.
-- **Node Shell support** — places **Copy** immediately after the visible **Shell** control.
-- **LXC Console support** — places **Copy** immediately after the visible **Console** control.
-- **Full retained-buffer copy** — ordinary shell copies include retained normal-buffer scrollback.
-- **Alternate-screen awareness** — active `top`, `nano`, `less`, and similar alternate-screen content is copied from the active alternate buffer.
-- **Wrapped-line reconstruction** — xterm physical rows marked as wrapped are reassembled into logical text lines.
-- **Navigation/reconnect resilience** — the active xterm instance is rediscovered instead of keeping a stale terminal reference.
-- **Firefox/userscript compatibility path** — terminal discovery checks both direct iframe globals and `wrappedJSObject` exposure.
-- **Stable toolbar layout** — button text stays **Copy**; success/error feedback uses the icon and tooltip instead of resizing the control.
-- **No split-button behavior** — the control is a standard ExtJS button.
+- Places one genuine ExtJS **Copy** button after the native Shell or Console control; Proxmox owns its appearance and layout.
+- Copies retained normal-buffer scrollback, or the active alternate screen used by applications such as `top`, `nano`, and `less`.
+- Preserves interior blank lines and wrapped spacing; trims completed-line ASCII padding and trailing blank rows. The development build preserves Unicode whitespace and handles wide-character wrap placeholders.
+- Rediscovers the terminal after navigation and reconnects. The development build matches the native console's owner, node, type, and guest identity, without depending on English labels.
+- Keeps button text stable. Icons/tooltips show buffer scope, failure, confirmed completion, or unconfirmed clipboard dispatch.
+- Runs as one directly installable JavaScript file: no runtime dependencies, build step, network requests, or transcript storage.
 
-## What problem does it solve?
+This is a snapshot of retained rendered terminal text, not a lossless session recording. Discarded scrollback cannot be recovered. Meaningful trailing ASCII spaces are not preserved by the cleanup policy.
 
-The project originally explored selection-driven copying. That approach was dropped because browser/Firefox selection behavior did not integrate cleanly with xterm selection for this use case, and a probe showed xterm `getSelection()` was already populated before `onSelectionChange()` ran.
+## Installation and trust
 
-Version 0.3.0 instead uses an explicit **Copy** action:
+1. Choose the documented [0.3.0 baseline](https://github.com/StarlightDaemon/proxmox-copy-console/blob/27a83d2ac836ef35c2f7e6644b6e448355631be0/proxmox-copy-console.user.js) or the explicitly experimental [development userscript](proxmox-copy-console.user.js).
+2. Import or paste it into your userscript manager. Keep only one version enabled.
+3. **Restrict its include rules to your trusted Proxmox hosts.** The supplied `https://*:8006/*` glob covers every HTTPS host on port 8006; the script also checks the actual protocol and port. Replace that broad rule, or disable it in your manager's overrides; adding a narrow rule alongside it does not narrow access. For example, use `https://pve.example.net:8006/*` or `https://192.0.2.10:8006/*`, replacing the example with your own host. Verify the manager's effective rules. The historical 0.3.0 source uses a regex include instead.
+4. Enable the script, open `https://<your-host>:8006/`, and enter a node Shell or LXC Console.
 
-1. discover the currently visible xterm terminal;
-2. choose the appropriate xterm buffer;
-3. rebuild wrapped physical rows into logical lines;
-4. remove only trailing empty viewport rows;
-5. write the resulting text to the clipboard with `GM_setClipboard`.
+Development grants are `GM_setClipboard` / `GM.setClipboard` (alternative clipboard API styles), `GM_info` / `GM.info` (manager identification), and `unsafeWindow` (page integration). Only one clipboard API is invoked per activation. The page and userscript manager must be trusted: a page-controlled ExtJS handler is not a security boundary enforcing human clicks. Copy includes offscreen retained output, which may contain sensitive information; inspect it before sharing.
 
-See [Project History](docs/HISTORY.md) and [Design](docs/DESIGN.md) for the recorded rationale and implementation details.
+The target is the **main Proxmox UI with embedded same-origin xterm frames**. Standalone console windows, reverse proxies on other ports, PDM remote consoles, noVNC/SPICE, and other guest console types are outside the established scope.
 
-## Supported baseline
+Target **current stable Proxmox VE, with Firefox as the primary browser and Chrome as the secondary compatibility target**. Firefox drives daily-workflow development and acceptance; both browsers remain required for a general release. Tampermonkey and Violentmonkey are the primary manager targets; Greasemonkey, FireMonkey, ScriptCat, and OrangeMonkey are additional candidates. The shared script includes legacy/modern clipboard APIs and a Firefox object-sharing adapter. See the [ten-app survey and compatibility matrix](docs/COMPATIBILITY.md) for sources, installation notes, and live-test priorities. All browser/manager combinations are still pending live acceptance; no separate manager-specific source forks are currently needed.
 
-| Surface | 0.3.0 status |
+## Usage and development behavior
+
+Click **Copy** after the native Shell or Console control. The development build uses these feedback states:
+
+| Feedback | Meaning |
 | --- | --- |
-| Proxmox node **Shell** | Documented |
-| LXC **Console** | Documented |
-| Normal xterm buffer + scrollback | Documented |
-| Active alternate xterm buffer | Documented |
-| Other Proxmox console types | Not established by the current baseline |
+| Check icon / `Copied …` | The clipboard API reported completion; the script does not read the OS clipboard back |
+| Information icon / `Sent …; clipboard unconfirmed` | The manager's write call returned without a completion signal |
+| Warning icon | Empty/unavailable buffer, extraction failure, clipboard error, or unconfirmed timeout |
+| Disabled Copy button | Its console is unavailable/ambiguous, or another Copy control has a pending write |
 
-The userscript targets the main Proxmox web UI at HTTPS port `8006` and operates on accessible xterm-backed console iframes.
+Tampermonkey's legacy completion callback is used when the manager identifies itself as Tampermonkey. Returned promises are awaited. A void return from either API style is reported as unconfirmed dispatch; modern `GM.setClipboard` does not necessarily return a promise. A five-second timeout is uncertainty, not proof of failure; inspect the clipboard before retrying. Requests are never retried automatically.
 
-## Installation
+Feedback lasts 1.5 seconds without changing the Copy label. After a completed dispatch, focus returns only if it is still on that same button and the same terminal is active. While pending, the initiating button remains focusable and repeated activations are ignored. Console discovery runs every 500 ms while the page is visible and immediately when visibility returns; idle discovery does not extract buffer rows.
 
-Use a userscript manager that supports the permissions used by the script:
+## Local checks and probes
 
-- `GM_setClipboard` — writes the extracted console text to the clipboard.
-- `unsafeWindow` — accesses Proxmox page globals such as ExtJS/xterm objects.
+Use Node.js 24; no npm install is needed:
 
-Then:
+```sh
+node tools/check.cjs
+node --test --test-isolation=none tests/console.test.cjs tests/compatibility.test.cjs tests/baseline.test.cjs tests/probe.test.cjs
+node tools/fetch-xterm.cjs
+node --test --test-isolation=none tests/*.test.cjs
+```
 
-1. Open [`proxmox-copy-console.user.js`](proxmox-copy-console.user.js).
-2. Import or paste the script into your userscript manager.
-3. Save and enable it.
-4. Open your Proxmox web interface at `https://<host>:8006/`.
-5. Open a supported **Shell** or **Console** view.
+The last two commands download a pinned, integrity-checked Proxmox xterm bundle into ignored `.cache/` and exercise its actual parser/buffer in Node. This is a development fixture only; it is never loaded by the userscript.
 
-> Specific Proxmox, browser, and userscript-manager version combinations have **not** yet been established by runtime acceptance in this repository.
+[Testing](docs/TESTING.md) records executed checks, remaining evidence gaps, and the live acceptance plan. The read-only [console probe](tools/probe-console.js) can diagnose integration structure without collecting transcript text or writing the clipboard.
 
-## Usage
+## Project documents
 
-1. Open a node **Shell** or LXC **Console** backed by xterm.
-2. Look for the **Copy** button immediately after the native **Shell** or **Console** control.
-3. Click **Copy**.
-4. The retained terminal content is written to the clipboard.
-5. The icon/tooltip briefly reports success or failure while the button text remains stable.
+- [Design](docs/DESIGN.md): current development behavior and the 0.3.0 baseline.
+- [Decisions](DECISIONS.md): accepted baseline rationale and development choices.
+- [History](docs/HISTORY.md): the earlier selection-to-copy pivot.
+- [Review](docs/REVIEW-2026-09-18.md): findings that motivated this iteration.
+- [Research and next steps](docs/RESEARCH.md): upstream contracts, evidence, and remaining decisions.
+- [Compatibility](docs/COMPATIBILITY.md): current stable platform policy, manager survey, and sandbox probe.
+- [Changelog](CHANGELOG.md): version status.
+- [AGENTS.md](AGENTS.md): repository mutation and evidence boundaries.
 
-### Buffer behavior
-
-For ordinary shell operation, the script prefers the **normal buffer** so retained scrollback is included.
-
-When an alternate-screen application is active, the script copies the **active alternate buffer**, which represents the content currently displayed by applications such as `top`, `nano`, or `less`.
-
-## How it integrates with Proxmox
-
-The script runs from the main Proxmox UI and periodically performs a lightweight rediscovery pass:
-
-- find a visible xterm iframe;
-- prefer console-looking iframe URLs, with a visible-frame fallback;
-- find the visible ExtJS **Shell** or **Console** toolbar control;
-- insert one genuine `Ext.button.Button` after that control;
-- avoid duplicate injected buttons in the same toolbar;
-- rediscover after navigation, reconnects, or component recreation.
-
-The scan interval in 0.3.0 is **500 ms**. Copy feedback is restored after **1000 ms**.
-
-## Verification status
-
-The 0.3.0 implementation is documented from repository/source inspection. This repository currently distinguishes static evidence from runtime acceptance:
-
-| Evidence | Status |
-| --- | --- |
-| Source/implementation inspection | Documented |
-| Local automated test execution | Not established |
-| Browser automation | Not established |
-| Manual Proxmox acceptance | Not established |
-| Cross-version Proxmox/browser/userscript-manager matrix | Not established |
-
-See [Testing](docs/TESTING.md) for the runtime/manual acceptance scenarios, including scrollback, wrapped lines, alternate screens, navigation/reconnects, resize behavior, hidden frames, and error feedback.
-
-## Project layout
-
-| Path | Purpose |
-| --- | --- |
-| [`proxmox-copy-console.user.js`](proxmox-copy-console.user.js) | Current 0.3.0 userscript implementation |
-| [`CHANGELOG.md`](CHANGELOG.md) | Version and baseline record |
-| [`DECISIONS.md`](DECISIONS.md) | Durable design decisions |
-| [`docs/DESIGN.md`](docs/DESIGN.md) | Implementation design |
-| [`docs/HISTORY.md`](docs/HISTORY.md) | Project lineage and selection-to-copy pivot |
-| [`docs/TESTING.md`](docs/TESTING.md) | Verification boundaries and acceptance scenarios |
-| [`AGENTS.md`](AGENTS.md) | Repository execution and mutation guidance |
-| [`LICENSE`](LICENSE) | MIT license |
-
-## Roadmap
-
-**0.4.0** is planned future work and remains intentionally unreleased. Experimental 0.4.0 behavior is not part of the documented 0.3.0 baseline and should not be treated as current functionality.
-
-## License
+The project stays focused on one job: accurately copy the intended console through one native button. Additions must solve a demonstrated copying-workflow problem at low complexity and maintenance cost. Optional viewport copying is an idea to revisit only if daily use warrants it; see the scope policy in [Decisions](DECISIONS.md#product-scope-and-simplicity).
 
 Released under the [MIT License](LICENSE).

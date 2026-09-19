@@ -2,6 +2,14 @@
 
 This file records durable decisions represented by the 0.3.0 baseline. Future ideas are not accepted merely because they are listed as possible 0.4.0 work.
 
+## Product scope and simplicity
+
+The product has one job: copy the intended Proxmox console's retained text accurately through one native Copy button. Firefox's daily homelab workflow leads; Chrome compatibility remains required.
+
+Accept an addition only when it solves a demonstrated problem in that copying workflow and its benefit justifies the code, permissions, interface, and ongoing maintenance it adds. Prioritize correctness, reliable targeting, useful failure feedback, and small compatibility fixes. Optional copying features need evidence of recurring use; a plausible idea alone does not put one on the roadmap.
+
+Keep one readable installable file, no runtime dependencies, and no required build step. The existing 20 KiB check is a review ceiling, not room to fill. Prefer removing duplication or an unnecessary branch over creating abstractions for hypothetical future uses. Tests and probes stay outside the shipped runtime; keep documentation focused and avoid duplicating policy across new files.
+
 ## Accepted for 0.3.0
 
 ### Use explicit full-buffer copying instead of selection-driven copying
@@ -30,6 +38,20 @@ This file records durable decisions represented by the 0.3.0 baseline. Future id
 
 **Decision:** Use the normal buffer for ordinary shell operation so retained scrollback is included. When the alternate buffer is active, copy that active alternate buffer because it represents the current alternate-screen display.
 
-## Deferred / future
+## Development choices for unreleased 0.4.0-dev.2
 
-0.4.0 remains future, unreleased work. No experimental 0.4.0 behavior is accepted by this document, and the 0.3.0 baseline must not silently absorb such changes.
+These choices apply to development source only. They do not revise the accepted 0.3.0 baseline and require the live acceptance gate in `docs/TESTING.md` before release.
+
+- **Bind to console ownership and exact identity.** Use native `pveConsoleButton` metadata and the owner's frame descendants. Resolve the loaded URL and terminal afresh per click; decline ambiguous or unsupported contexts. English labels and global-frame fallbacks cannot establish ownership.
+- **Preserve Unicode whitespace and distinguish wide-wrap placeholders.** Keep the ASCII-padding cleanup policy explicit. Use public buffer/cell APIs and current display columns, without changing terminal options or using xterm private internals.
+- **Report the strength of clipboard evidence.** Await a supported callback/promise; label void-returning dispatch unconfirmed. Do not add clipboard reading, automatic retries, a fallback API chain, or an automatic clearing timer. A timeout is uncertainty and does not cancel an extension write.
+- **Keep polling simple.** Skip hidden documents and scan on visibility return. Keep the 500 ms foreground interval until actual traces justify changing it. Never extract buffer rows on idle scans.
+- **Keep one installable file with no runtime dependencies.** Tests may download a pinned, verified Proxmox xterm bundle into ignored `.cache/`. Node built-ins provide the test/check tools, and CI uses pinned actions with read-only permissions.
+- **Restore focus conservatively.** Only the same focused button and same active terminal qualify. Do not intercept terminal keyboard shortcuts.
+- **Keep trust configuration outside a new settings system.** Document manager-level host restrictions; preserve userscript identity and do not introduce an auto-update channel.
+- **Target rolling stable platforms, Firefox first.** Current stable Proxmox VE with its standard console packages is the intended platform. Firefox is the primary development/acceptance browser for the maintainer's daily homelab workflow; Chrome is the secondary compatibility target. Both remain required for general-release acceptance. Prioritize Tampermonkey/Violentmonkey and test additional manager families separately. Do not maintain legacy-version shims speculatively.
+- **Share one implementation across managers.** Select legacy/modern clipboard capabilities before a write; export Firefox callbacks/configuration only when the sandbox provides `cloneInto`. Keep callbacks free of page arguments and privileged return values. Add a generated variant only when an actual manager incompatibility requires one; do not maintain ten manual forks to match an arbitrary app count. See [Compatibility](docs/COMPATIBILITY.md).
+
+## Deferred
+
+Viewport-only copying is an uncommitted idea, not a planned feature. Revisit only if daily use demonstrates a need, then define scrolled-viewport semantics, wrapped edges, and an accessible activation method within the simplicity policy. No broad compatibility fallback is added without probe evidence from the target installation.

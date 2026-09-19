@@ -1,10 +1,46 @@
 # Design
 
+## 0.4.0-dev.2 — unreleased development implementation
+
+The root userscript is now a development build. The 0.3.0 design is retained below and its source remains pinned at `27a83d2ac836ef35c2f7e6644b6e448355631be0`. No live acceptance is implied by the development changes.
+
+### Console association
+
+Discovery queries `pveConsoleButton` components, accepts visible `shell`/`lxc` controls with node/guest identity, and inspects iframe descendants of their toolbar owner's DOM element. The loaded frame URL must be same-origin and match `xtermjs=1`, console type, node, and (for LXC) guest ID exactly. Remote-console parameters are excluded. Exactly one eligible terminal and one native console anchor per toolbar are required. A stale `src` attribute or an unrelated global frame cannot satisfy this association.
+
+The direct and Firefox `wrappedJSObject` terminal paths remain. Each click resolves its own current frame and terminal again. The Map retains toolbar/button state, never a terminal between operations. Existing controls disable when their context is unavailable and recover on a later scan. Unsupported component shapes fail closed; the diagnostic probe provides evidence before adding compatibility fallbacks.
+
+Page integration selects `unsafeWindow`, Firefox `wrappedJSObject`, or the current window. When the sandbox provides `cloneInto`, the button configuration and destroy callback are cloned with function sharing. Those exported callbacks ignore page arguments and return no sandbox objects, including promises. Failure to share is contained by the existing installation boundary; no eval/injected bridge is attempted. The include glob is backed by an actual HTTPS/port-8006/top-frame guard before listeners or polling start. See [Compatibility](COMPATIBILITY.md) for platform policy and evidence limits.
+
+### Text extraction
+
+Physical rows are joined using `isWrapped`. Only ASCII spaces at a completed logical line's right edge and trailing empty logical rows are removed. Unicode whitespace and interior blank lines survive. Extraction limits translated columns to the terminal's current width, excluding cells retained beyond the display width after resize.
+
+When the next row is wrapped and begins with a width-two glyph, an empty width-one final cell is an xterm wrap placeholder. That cell alone is omitted; a literal space cell is preserved. This distinction was exercised against Proxmox's pinned xterm 6.0.0 bundle. Normal/alternate buffer selection remains explicit. Missing rows remain blank lines, and non-finite/invalid lengths are rejected. This is rendered-text copying, not byte-exact terminal recording.
+
+### Clipboard and feedback
+
+The copy operation catches discovery, extraction, and clipboard failures at its boundary. Only fixed error messages reach feedback; transcript text and arbitrary exception content are not logged. One global pending flag prevents overlapping writes across controls. Other buttons disable during a pending write; the initiating button stays focusable and ignores repeated activation.
+
+The adapter selects callable `GM_setClipboard`, otherwise `GM.setClipboard` with its receiver intact. Tampermonkey's legacy callback is used when `GM_info` or `GM.info` identifies that manager. A returned thenable is awaited from either API style; even modern APIs may return void, which reports dispatch without claiming completion. Selection is by availability before the write, never a fallback after failure. A five-second watchdog reports uncertainty and does not retry or cancel the manager operation. Late completion cannot replace the timeout feedback. The script does not read the OS clipboard, and a delayed manager write could still finish after a timeout.
+
+Normal/alternate scope appears in the tooltip. One replaceable 1.5-second feedback timer per button avoids old timers resetting newer feedback. Destroyed buttons release their timer/state. Focus restoration requires the same focused button element, a focused/visible document, and the same freshly resolved terminal. It is skipped after focus or console changes.
+
+### Lifecycle and cost
+
+Discovery runs immediately, every 500 ms, and on visibility return. Hidden pages exit before querying components or frames. Buffer rows are read only for an explicit copy. Component-query failures disable controls and retry; failed insertions dispose of partial buttons. Integration warnings are limited to one per 30 seconds. Native ExtJS insertion and optional layout flushing own sizing; no output MutationObserver, private router hooks, or runtime libraries are introduced.
+
+### Trust and evidence
+
+Matching the native component and URL prevents accidental cross-console selection; it does not authenticate a hostile page. Installation must be restricted to trusted hosts. Both legacy and modern clipboard/info grants are declared for manager compatibility. [Testing](TESTING.md) separates mocks, actual parser execution, and live acceptance. [Research](RESEARCH.md) pins the upstream sources behind these choices.
+
+## 0.3.0 baseline design (historical)
+
 ## Scope
 
 Version 0.3.0 adds an explicit native-looking **Copy** control to supported Proxmox xterm consoles and copies terminal text from xterm's retained buffer.
 
-The design is intentionally based on the supplied 0.3.0 source, not on inferred future behavior.
+The following sections describe the historical 0.3.0 source, not the development implementation above.
 
 ## Main-page execution
 
