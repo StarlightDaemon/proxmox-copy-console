@@ -2,11 +2,11 @@
 
 ## Candidate: 0.4.1-dev.1
 
-Branch `codex/firemonkey-compat` starts at `0413765bcf1cd0aa09db4e60667bf9e034071ce6`. The candidate uses local discovery loops and separate function exports to address the live FireMonkey failures recorded below. Stable 0.4.0 remains on main. The maintainer reports successful copying in FireMonkey; full candidate acceptance and primary Firefox/Violentmonkey regression testing remain pending.
+Branch `codex/firemonkey-compat` starts at `0413765bcf1cd0aa09db4e60667bf9e034071ce6`. The candidate uses local discovery loops and separate function exports to address the live FireMonkey failures recorded below. Stable 0.4.0 remains on main. The maintainer reports successful copying in FireMonkey and a successful primary Firefox/Violentmonkey workflow regression. Broader candidate qualification remains pending.
 
 Local verification on 2026-09-19: `node tools/check.cjs`, `node tools/fetch-xterm.cjs` (cached pinned fixture verified), `node --test --test-isolation=none tests/*.test.cjs` (**88 passed, zero failures/skips**), and `git diff --check` passed. The three new compatibility regressions cover rejected page-array callbacks, explicit function exports with no privileged return values, and contained export failure. Candidate source is **18,224 bytes**, SHA-256 `d170fb0e7156ede5120ece560404891d9fb3180eba57e7600b1d6d708457b6ff`. Mocks check our contracts, not native Firefox compartments or real clipboard behavior.
 
-Next live check: disable FireMonkey and the temporary probe, install the same candidate in Violentmonkey with trusted-host restrictions preserved, and reload. Check one Copy button and actual pasted text on node Shell and LXC Console, then navigation and repeated copying. Recheck Firefox + Violentmonkey before promotion, with only one manager enabled at a time. Test Tampermonkey as a regression check, then the planned Chrome combinations. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
+Next live checks: test Tampermonkey with this same candidate as a regression check, then the planned Chrome combinations when the maintainer is ready. Keep one manager enabled at a time and preserve trusted-host restrictions. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
 
 [GitHub Actions passed for candidate commit 6d803b0](https://github.com/StarlightDaemon/proxmox-copy-console/actions/runs/35427181257). This is automated validation, not live acceptance.
 
@@ -18,7 +18,15 @@ The maintainer then responded to the candidate-only reload request with a log co
 
 In response to the requested scripts-disabled baseline comparison, the maintainer supplied another log containing both `fireFn`/`timerId` and null-controller `loadTags` exceptions, with no project script/probe messages. Treat this as the reported baseline run based on the conversational context; the log itself does not independently verify extension toggles. The same exceptions occurring in that comparison suggests they are not introduced by the candidate. Their underlying page/extension cause remains undiagnosed; do not label them a confirmed Proxmox bug or patch unrelated page behavior in this userscript.
 
-No further runtime change is justified by these errors alone. Continue the primary Firefox + Violentmonkey regression check before promotion. Preserve FireMonkey's reported copying success without claiming complete scenario coverage. Stable main remains 0.4.0.
+No further runtime change is justified by these errors alone. Preserve FireMonkey's reported copying success without claiming complete scenario coverage. Stable main remains 0.4.0.
+
+### Firefox + Violentmonkey regression — 2026-09-19
+
+In response to testing the pinned 0.4.1-dev.1 candidate at `6d803b0946af66c021bc9999cfdce292de750120` in Violentmonkey, the maintainer reports all copy functionality working with no issues, including shells, container consoles, and dynamically switching between them. Record a successful primary workflow regression. Firefox 156.0 (64-bit), Violentmonkey 2.49.0, and Proxmox VE 9.2.3 carry forward from the established test environment; this reply does not independently re-establish manager/browser versions. Exact synthetic-text comparisons and the full edge-case checklist remain unrecorded.
+
+The supplied log has font-visibility/layout warnings and xterm startup messages, with none of the earlier `fireFn`/`timerId`, null-controller `loadTags`, or project integration errors visible. This observation does not identify the cause of earlier exceptions or guarantee their permanent absence.
+
+Firefox denies the requested DejaVu Sans Mono and Liberation Mono fonts at visibility level 2 (requiring 3). [Mozilla documents font restrictions as fingerprinting protection](https://support.mozilla.org/en-US/kb/firefox-protection-against-fingerprinting). The effective browser setting was not inspected. The script reads retained terminal text and does not configure fonts; no privacy-setting or font workaround is added. Visual rendering and reported copying success remain separate observations.
 
 ## Current evidence: 0.4.0
 

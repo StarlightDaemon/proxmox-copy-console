@@ -67,7 +67,7 @@ For each manager, keep the same script version and benign output, enable only on
 | Priority | Combination | Status |
 | --- | --- | --- |
 | 1 | Firefox stable + Tampermonkey stable | Pass, maintainer-reported: Tampermonkey 5.5.0 with script 0.4.0-dev.2 in the Firefox test round; fully tested and working, no issues reported |
-| 1 | Firefox stable + Violentmonkey stable | Workflow passed: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; remaining scenario qualification pending |
+| 1 | Firefox stable + Violentmonkey stable | Workflow passed on dev.2 and candidate 0.4.1-dev.1: maintainer reports shell/container copying and dynamic switching work without issues. Established environment: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; full scenario qualification pending |
 | 2 | Firefox stable + Greasemonkey stable | Next Firefox round |
 | 2 | Firefox stable + FireMonkey stable | Stable workflow failed: 3.8 shows no Copy button. Candidate 0.4.1-dev.1: maintainer reports Copy worked with probe disabled. ExtJS fireFn/timerId and loadTags errors also appear in the supplied scripts-disabled baseline; candidate-specific cause not established. Full scenario qualification pending; popup port-matching issue remains separate |
 | 2 | Firefox stable + ScriptCat stable | Next Firefox round |
