@@ -69,7 +69,7 @@ For each manager, keep the same script version and benign output, enable only on
 | 1 | Firefox stable + Tampermonkey stable | Pass, maintainer-reported: Tampermonkey 5.5.0 with script 0.4.0-dev.2 in the Firefox test round; fully tested and working, no issues reported |
 | 1 | Firefox stable + Violentmonkey stable | Workflow passed: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; remaining scenario qualification pending |
 | 2 | Firefox stable + Greasemonkey stable | Next Firefox round |
-| 2 | Firefox stable + FireMonkey stable | Stable workflow failed: 3.8 shows no Copy button. Revision-2 live probe reports callback-cloning and page-array filter/some failures; discovery and owner/frame presence pass. Candidate 0.4.1-dev.1 addresses these paths; live acceptance pending. Popup port-matching issue remains separate |
+| 2 | Firefox stable + FireMonkey stable | Stable workflow failed: 3.8 shows no Copy button. Candidate 0.4.1-dev.1: maintainer reports Copy worked with probe disabled, but ExtJS fireFn/timerId and loadTags errors persist. Scripts-disabled baseline and full candidate acceptance pending. Popup port-matching issue remains separate |
 | 2 | Firefox stable + ScriptCat stable | Next Firefox round |
 | 3 | Chrome stable + Tampermonkey stable | Deferred by maintainer for this round |
 | 3 | Chrome stable + Violentmonkey stable MV3 | Deferred by maintainer for this round |
