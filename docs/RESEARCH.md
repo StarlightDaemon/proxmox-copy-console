@@ -1,6 +1,6 @@
 # Research and implementation strategy
 
-Recorded 2026-09-18, updated for unreleased `0.4.0-dev.2`. This document links API evidence to implementation choices and identifies what live testing still needs to decide. The [compatibility policy and ten-app survey](COMPATIBILITY.md) add current stable Proxmox, Chrome, Firefox, and manager-specific primary sources.
+Recorded 2026-09-18 for `0.4.0-dev.2`, promoted to `0.4.0` with unchanged runtime following maintainer-reported live acceptance. This document links API evidence to implementation choices and identifies remaining validation. The [compatibility policy and ten-app survey](COMPATIBILITY.md) add current stable Proxmox, Chrome, Firefox, and manager-specific primary sources.
 
 ## Upstream contracts inspected
 
@@ -44,7 +44,7 @@ Other fixtures exercise Unicode whitespace, emoji, combining text, retained scro
 Track ownership, status, and completion criteria in [Open loops](OPEN-LOOPS.md). The points below explain the technical rationale rather than a second task queue.
 
 1. If the structure probe matches the expected ownership, keep the current strict resolver. If it fails, add only the smallest fallback justified by actual version-specific evidence, with a regression fixture. Do not restore global first-visible-frame copying.
-2. Test current stable Firefox first for the daily homelab workflow, then Chrome for compatibility, beginning with Tampermonkey and Violentmonkey as specified in the matrix. Both browsers remain in the general-release gate. The shared adapter now covers both GM API styles. Add manager-specific variants only for observed incompatibilities. Do not add a second write API as an automatic retry; a delayed original write could overwrite newer clipboard contents.
+2. Complete current stable Firefox qualification first, then Chrome compatibility, beginning with Tampermonkey and Violentmonkey as specified in the matrix. Broader qualification remains open after the maintainer's 0.4.0 promotion decision. The shared adapter covers both GM API styles. Add manager-specific variants only for observed incompatibilities. Do not add a second write API as an automatic retry; a delayed original write could overwrite newer clipboard contents.
 3. Evaluate the guarded focus return with actual keyboard use. If it disrupts navigation, remove that convenience or narrow its condition before release.
 4. Keep the 500 ms interval unless traces show a meaningful cost. Do not substitute a terminal-output observer or permanent terminal cache without measurements.
 5. Finish acceptance and simplify any unnecessary code before considering optional features. Revisit viewport-only copying only if daily use demonstrates a recurring need and it meets the scope policy in Decisions; passing acceptance alone is not a reason to expand the feature set.
@@ -53,4 +53,4 @@ Track ownership, status, and completion criteria in [Open loops](OPEN-LOOPS.md).
 
 The baseline source is 12,846 Git bytes; `0.4.0-dev.1` was 15,956 bytes. The current runtime retains a 20 KiB check budget and remains one dependency-free file; [Testing](TESTING.md) records its measured size/hash. No minification, transpilation, npm packages, or build artifacts are needed to install it. Tests and research tools are development-only; their purpose is to make future changes cheap to verify. Keep runtime growth tied to observable reliability or user value.
 
-This is an unreleased development snapshot. Publishing its source does not establish live acceptance or create a stable release. The next engineering step is Firefox-first live acceptance once the target environment is available, followed by Chrome compatibility checks.
+The maintainer's live node/LXC report supports promotion of the unchanged runtime to 0.4.0. Next record the environment details and remaining Firefox scenario evidence, followed by Chrome compatibility checks. Keep the scope of that user report distinct from automated tests and full matrix qualification.

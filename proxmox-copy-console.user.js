@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Proxmox Copy Console
 // @namespace    homelab
-// @version      0.4.0-dev.2
-// @description  Copies the retained buffer of an embedded Proxmox xterm console. Unreleased development build.
+// @version      0.4.0
+// @description  Copies the retained buffer of an embedded Proxmox xterm console.
 // @include      https://*:8006/*
 // @grant        GM_setClipboard
 // @grant        GM_info

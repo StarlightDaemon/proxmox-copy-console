@@ -40,7 +40,7 @@
         return result;
     }
     const result = {
-        probe: 'proxmox-copy-console/0.4.0-dev.2',
+        probe: 'proxmox-copy-console/0.4.0',
         topPage: window.top === window.self,
         pageVisible: !document.hidden,
         proxmoxGlobal: !!window.PVE,

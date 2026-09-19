@@ -38,9 +38,9 @@ Keep one readable installable file, no runtime dependencies, and no required bui
 
 **Decision:** Use the normal buffer for ordinary shell operation so retained scrollback is included. When the alternate buffer is active, copy that active alternate buffer because it represents the current alternate-screen display.
 
-## Development choices for unreleased 0.4.0-dev.2
+## Accepted for 0.4.0
 
-These choices apply to development source only. They do not revise the accepted 0.3.0 baseline and require the live acceptance gate in `docs/TESTING.md` before release.
+These choices were implemented in 0.4.0-dev.2 and promoted without runtime changes after the maintainer's live node/LXC copy-paste acceptance on 2026-09-18. They do not revise the historical 0.3.0 baseline. The maintainer's promotion decision accepts that observed workflow; the broader browser/manager qualification plan remains open in `docs/TESTING.md`.
 
 - **Bind to console ownership and exact identity.** Use native `pveConsoleButton` metadata and the owner's frame descendants. Resolve the loaded URL and terminal afresh per click; decline ambiguous or unsupported contexts. English labels and global-frame fallbacks cannot establish ownership.
 - **Preserve Unicode whitespace and distinguish wide-wrap placeholders.** Keep the ASCII-padding cleanup policy explicit. Use public buffer/cell APIs and current display columns, without changing terminal options or using xterm private internals.
@@ -49,7 +49,7 @@ These choices apply to development source only. They do not revise the accepted 
 - **Keep one installable file with no runtime dependencies.** Tests may download a pinned, verified Proxmox xterm bundle into ignored `.cache/`. Node built-ins provide the test/check tools, and CI uses pinned actions with read-only permissions.
 - **Restore focus conservatively.** Only the same focused button and same active terminal qualify. Do not intercept terminal keyboard shortcuts.
 - **Keep trust configuration outside a new settings system.** Document manager-level host restrictions; preserve userscript identity and do not introduce an auto-update channel.
-- **Target rolling stable platforms, Firefox first.** Current stable Proxmox VE with its standard console packages is the intended platform. Firefox is the primary development/acceptance browser for the maintainer's daily homelab workflow; Chrome is the secondary compatibility target. Both remain required for general-release acceptance. Prioritize Tampermonkey/Violentmonkey and test additional manager families separately. Do not maintain legacy-version shims speculatively.
+- **Target rolling stable platforms, Firefox first.** Current stable Proxmox VE with its standard console packages is the intended platform. Firefox is the primary development/acceptance browser for the maintainer's daily homelab workflow; Chrome is the secondary compatibility target. Both require evidence before claiming cross-browser qualification. The maintainer approved 0.4.0 promotion on the reported live workflow while remaining matrix coverage stays open. Prioritize Tampermonkey/Violentmonkey and test additional manager families separately. Do not maintain legacy-version shims speculatively.
 - **Share one implementation across managers.** Select legacy/modern clipboard capabilities before a write; export Firefox callbacks/configuration only when the sandbox provides `cloneInto`. Keep callbacks free of page arguments and privileged return values. Add a generated variant only when an actual manager incompatibility requires one; do not maintain ten manual forks to match an arbitrary app count. See [Compatibility](docs/COMPATIBILITY.md).
 
 ## Deferred

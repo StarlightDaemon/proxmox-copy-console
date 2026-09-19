@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Proxmox Copy Console - manager probe
 // @namespace    homelab
-// @version      0.4.0-dev.2
+// @version      0.4.0
 // @description  Temporary read-only userscript-context capability report. No clipboard calls or terminal text.
 // @include      https://*:8006/*
 // @grant        GM_setClipboard
@@ -17,7 +17,7 @@
 (() => {
     'use strict';
     if (window.top !== window.self || location.protocol !== 'https:' || location.port !== '8006') return;
-    const report = { probe: 'proxmox-copy-console/manager/0.4.0-dev.2' };
+    const report = { probe: 'proxmox-copy-console/manager/0.4.0' };
     try {
         const modern = typeof GM !== 'undefined' ? GM : undefined;
         const info = typeof GM_info !== 'undefined' ? GM_info : modern?.info;

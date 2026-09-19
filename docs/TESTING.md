@@ -1,8 +1,8 @@
 # Testing
 
-## Current evidence: 0.4.0-dev.2 (unreleased)
+## Current evidence: 0.4.0
 
-The source is an unreleased development snapshot and remains unaccepted on a live Proxmox installation. The documented 0.3.0 baseline is at commit `27a83d2ac836ef35c2f7e6644b6e448355631be0`. Source inspection, mock execution, real parser execution, and live clipboard/browser acceptance are separate evidence classes.
+Version 0.4.0 promotes the unchanged runtime from 0.4.0-dev.2 following maintainer-reported live acceptance below. The historical 0.3.0 baseline is at commit `27a83d2ac836ef35c2f7e6644b6e448355631be0`. Source inspection, mock execution, real parser execution, CI, and user-reported live results are separate evidence classes.
 
 | Date | Surface | Environment | Evidence |
 | --- | --- | --- | --- |
@@ -11,14 +11,16 @@ The source is an unreleased development snapshot and remains unaccepted on a liv
 | 2026-09-18 | Development integration | Node 24.18.0 / mocked DOM, ExtJS, manager, clipboard, timers | Regression suite exercises installed handlers, targeting, errors, lifecycle, clipboard status, and focus guards |
 | 2026-09-18 | Actual xterm parser/buffer | Proxmox xterm 6.0.0 bundle, pinned revision in `tools/fetch-xterm.cjs`, Node without DOM renderer | Wrapping, wide glyphs, literal spaces, Unicode whitespace, emoji/combining text, scrollback, resize, alternate screen, and handler integration |
 | 2026-09-18 | Diagnostic probe | Mocked Proxmox page | Confirms structural reporting without reading buffer rows or emitting transcript/identity strings |
-| Pending | Live node Shell / LXC Console | Proxmox, browser, and userscript-manager versions to be recorded | No live execution or OS clipboard writes performed |
+| 2026-09-18; versions supplied 2026-09-19 | Maintainer-reported live node Shell / LXC Console | Firefox 156.0 (64-bit), Proxmox VE 9.2.3; userscript manager not yet identified | Successful full copy/paste with expected detail and correct current-console targeting on dev.2; version screenshot supplied, copying not independently observed by the coding agent |
 | 2026-09-18 | GitHub Actions | Fresh Ubuntu / Node 24, commit `68c0f50` | [Checks passed](https://github.com/StarlightDaemon/proxmox-copy-console/actions/runs/35424235814), including fresh fixture download and the full test suite |
 
 The tests do not emulate Firefox compartments, browser same-origin enforcement, native ExtJS focus/layout, or extension clipboard permissions. The real xterm fixture executes its public parser and buffer API without `open()` or a renderer; it does not run Proxmox's websocket/termproxy code.
 
 Earlier `0.4.0-dev.1` local run on 2026-09-18: **65 tests passed, zero failures/skips** (44 mocked integration cases, five baseline comparisons, one diagnostic case, 15 actual-parser cases). Its source was 15,956 bytes; SHA-256: `32597f0c5cdb370247f10c7c7cd0f1abf34608b46cf84748a5371050d003b93f`. This is historical evidence, not the current source hash.
 
-Version `0.4.0-dev.2` final local run before publication on 2026-09-18: **82 tests passed, zero failures/skips** (44 integration cases, 16 compatibility cases, five baseline comparisons, two probe cases, 15 actual-parser cases). It adds modern clipboard, explicit Firefox sharing, page exposure, and runtime URL-guard coverage. The sharing tests check our adapter's contracts; they cannot reproduce Firefox's native compartment enforcement. Syntax/metadata/version/size checks and 33 local Markdown links passed, as did `git diff --check`. Current source: **17,327 bytes**, SHA-256 `3982b2afc13b10ad798434070ee6f4b3760771fdacc81591ed607101230239e8`. This is 1,371 bytes over dev.1 and remains below the 20 KiB budget. These checks ran on local Windows / Node 24.18.0. Live browser/clipboard acceptance remains pending; remote CI is recorded independently on each GitHub commit.
+Version `0.4.0-dev.2` final local run before publication on 2026-09-18: **82 tests passed, zero failures/skips** (44 integration cases, 16 compatibility cases, five baseline comparisons, two probe cases, 15 actual-parser cases). It added modern clipboard, explicit Firefox sharing, page exposure, and runtime URL-guard coverage. The sharing tests check our adapter's contracts; they cannot reproduce Firefox's native compartment enforcement. Syntax/metadata/version/size checks and 33 local Markdown links passed, as did `git diff --check`. Checkpoint source: **17,327 bytes**, SHA-256 `3982b2afc13b10ad798434070ee6f4b3760771fdacc81591ed607101230239e8`. This was 1,371 bytes over dev.1 and below the 20 KiB budget. These checks ran on local Windows / Node 24.18.0 before the live report below; remote CI is recorded independently on each GitHub commit.
+
+Promotion verification for `0.4.0` on 2026-09-19: **82 tests passed, zero failures/skips**. Direct comparison with the live-tested source at `d560ded` confirms that the userscript body after the metadata header is identical. Current source: **17,291 bytes**, SHA-256 `d6fc203571daffcc740c3355db80c78595462ed2e927aa48ae1b3228e421ef1d`. Syntax, metadata, version, size, local links, and whitespace checks passed. Only the version and release description changed in the production userscript.
 
 ## Reproduce local checks
 
@@ -48,13 +50,21 @@ The helper verifies the historical source blob before running the fixtures. The 
 
 Open an embedded node Shell or LXC Console, select the **top Proxmox page** in browser developer tools, inspect [probe-console.js](../tools/probe-console.js), then paste that script into the developer console. It prints a JSON report and returns it. Run it once for node Shell and once for LXC.
 
-For the active supported console, expect `topPage`, `pageVisible`, and `proxmoxGlobal` to be true. Its anchor should have identity and an owner element, one toolbar anchor, and exactly one eligible frame. That frame should be same-origin, identity-matched, and have a readable buffer through the direct or wrapped path. `copyButtons` should be one with the development script enabled.
+For the active supported console, expect `topPage`, `pageVisible`, and `proxmoxGlobal` to be true. Its anchor should have identity and an owner element, one toolbar anchor, and exactly one eligible frame. That frame should be same-origin, identity-matched, and have a readable buffer through the direct or wrapped path. `copyButtons` should be one with the script enabled.
 
 The probe does not read buffer rows, change focus, create controls, invoke clipboard APIs, or make network requests. It omits host names, guest IDs, full URLs, and transcripts. Devtools sees page globals, so this result alone cannot establish that the userscript manager exposes the same objects to its sandbox. Record the manager version from its own UI.
 
-## Live acceptance plan (not yet run)
+## Maintainer live acceptance — 2026-09-18
 
-Use the current stable Proxmox/browser policy and the nine combinations in [Compatibility](COMPATIBILITY.md#live-test-priority-and-evidence). Run the separate temporary [manager probe](../tools/probe-manager.user.js) inside each userscript manager before the top-page structure probe; do not confuse page devtools with the manager sandbox. All combinations remain pending.
+The maintainer tested the pinned `0.4.0-dev.2` userscript at commit `d560ded96ffcdb06da494249715bb148e54470f3`, SHA-256 `3982b2afc13b10ad798434070ee6f4b3760771fdacc81591ed607101230239e8`, obtained from the reviewed raw-script link. They reported successful use across several nodes and several container consoles, full copy/paste with the expected detail, and text taken from the correct current console. They requested promotion on that evidence.
+
+On 2026-09-19 the maintainer supplied a screenshot showing **Firefox 156.0 (64-bit)** and **Proxmox VE 9.2.3** for the tested environment. The userscript manager and its version, and the installed `pve-xtermjs` package version, are not shown and remain unrecorded. Only the relevant version facts are transcribed here; the screenshot's host addresses, node/guest identities, and terminal content are not published.
+
+No sanitized probe report, exact text comparison, or individual edge-case results were supplied. This report establishes observed Firefox user-workflow success, not completion of the full scenario checklist or manager matrix; Chrome and other unreported configurations remain unverified. Version 0.4.0 changes the userscript metadata only, preserving the tested runtime.
+
+## Remaining live acceptance plan
+
+Use the current stable Proxmox/browser policy and the nine combinations in [Compatibility](COMPATIBILITY.md#live-test-priority-and-evidence). Run the separate temporary [manager probe](../tools/probe-manager.user.js) inside each userscript manager before the top-page structure probe; do not confuse page devtools with the manager sandbox. The maintainer's report above does not by itself complete any full matrix row.
 
 Use benign synthetic output, a scratch plain-text destination, and one enabled script version. Record script SHA-256 (`node tools/check.cjs`), Proxmox/pve-xtermjs package versions, browser/manager versions, language, date, and actual results. Use the pinned 0.3.0 source as a rollback point; no server file changes are needed.
 
@@ -92,6 +102,8 @@ A clipboard timeout cannot cancel a manager operation. If encountered, inspect c
 | Focus, layout, completion behavior | Pending |
 | Result / limitations | Pending |
 
-## Release gate
+## Promotion decision and broader qualification
 
-Before labeling 0.4.0 accepted for general release, pass local checks and all four primary browser/manager rows in [Compatibility](COMPATIBILITY.md#live-test-priority-and-evidence): Firefox and Chrome, each with Tampermonkey and Violentmonkey. Each combination must cover node Shell, LXC, text fidelity, alternate screens, navigation, focus, and clipboard completion semantics. Record exact observed compatibility, including limitations; extended managers may remain explicitly unverified. CI, mocks, and downloaded source are not manual Proxmox acceptance.
+The earlier plan gated promotion on four complete primary browser/manager rows. On 2026-09-18 the maintainer requested promotion after the reported node/LXC workflow tests. Version 0.4.0 follows that decision with the tested runtime unchanged and the narrower evidence stated explicitly. This does not mark the broader qualification plan complete.
+
+Before claiming full primary browser/manager qualification, pass all four primary rows in [Compatibility](COMPATIBILITY.md#live-test-priority-and-evidence): Firefox and Chrome, each with Tampermonkey and Violentmonkey. Each combination must cover node Shell, LXC, text fidelity, alternate screens, navigation, focus, and clipboard completion semantics. Record exact observed compatibility, including limitations; extended managers may remain explicitly unverified. CI, mocks, and downloaded source are not manual Proxmox acceptance.

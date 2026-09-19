@@ -1,8 +1,8 @@
 # Design
 
-## 0.4.0-dev.2 — unreleased development implementation
+## 0.4.0 — current implementation
 
-The root userscript is now a development build. The 0.3.0 design is retained below and its source remains pinned at `27a83d2ac836ef35c2f7e6644b6e448355631be0`. No live acceptance is implied by the development changes.
+Version 0.4.0 promotes the runtime from 0.4.0-dev.2 without behavior changes, following the maintainer's live copy/paste report. [Testing](TESTING.md) records the scope and limits of that acceptance. The 0.3.0 design is retained below and its source remains pinned at `27a83d2ac836ef35c2f7e6644b6e448355631be0`.
 
 ### Console association
 
@@ -40,7 +40,7 @@ Matching the native component and URL prevents accidental cross-console selectio
 
 Version 0.3.0 adds an explicit native-looking **Copy** control to supported Proxmox xterm consoles and copies terminal text from xterm's retained buffer.
 
-The following sections describe the historical 0.3.0 source, not the development implementation above.
+The following sections describe the historical 0.3.0 source, not the current implementation above.
 
 ## Main-page execution
 

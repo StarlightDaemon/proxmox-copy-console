@@ -2,7 +2,7 @@
 
 ## Target platform
 
-**Firefox is the primary development and acceptance browser**, reflecting the maintainer's daily homelab workflow. **Chrome is the secondary compatibility target** and remains part of the general-release acceptance gate. Start investigation and usability checks in Firefox, especially sandbox access, clipboard behavior, keyboard focus, and navigation; verify the same behavior in Chrome before claiming cross-browser support. Keep one shared implementation.
+**Firefox is the primary development and acceptance browser**, reflecting the maintainer's daily homelab workflow. **Chrome is the secondary compatibility target**. Start investigation and usability checks in Firefox, especially sandbox access, clipboard behavior, keyboard focus, and navigation; verify the same behavior in Chrome before claiming cross-browser qualification. Keep one shared implementation. The maintainer approved 0.4.0 promotion after live node/LXC copy-paste testing; this does not complete the wider matrix.
 
 Target the latest **stable Proxmox VE**, with its standard web UI and packaged xterm console, on current stable desktop **Chrome and Firefox**. As researched on 2026-09-18, the current release line is **Proxmox VE 9.2**, announced on May 21, 2026 ([official release](https://www.proxmox.com/en/about/company-details/press-releases/proxmox-virtual-environment-9-2), [downloads](https://www.proxmox.com/en/downloads/proxmox-virtual-environment)). Record the actual installed package versions; the release line alone does not identify the console bundle.
 
@@ -10,7 +10,7 @@ This is a rolling target, not a promise that an untested future release works. R
 
 ## Ten-app survey
 
-There is no verified cross-store top-ten ranking. The survey below prioritizes full userscript managers and separately records adjacent injectors and a Safari-only manager. Store counts are rounded, store-specific snapshots observed on 2026-09-18, not total users, security endorsements, or proof of compatibility. A dash means no comparable count was recorded. Browser columns describe publisher offerings; **none of these combinations has passed this project's live acceptance yet**.
+There is no verified cross-store top-ten ranking. The survey below prioritizes full userscript managers and separately records adjacent injectors and a Safari-only manager. Store counts are rounded, store-specific snapshots observed on 2026-09-18, not total users, security endorsements, or proof of compatibility. A dash means no comparable count was recorded. Browser columns describe publisher offerings; the [maintainer's live workflow report](TESTING.md#maintainer-live-acceptance--2026-09-18) covers Firefox 156.0 (64-bit) on Proxmox VE 9.2.3. The manager is not yet identified, so the report is not assigned to a specific matrix row.
 
 | App and primary source | Chrome | Firefox | Observed adoption signal | Project disposition |
 | --- | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ Six manager families produce **nine browser/manager combinations** to investigat
 
 ## One script, small compatibility adapters
 
-Development version `0.4.0-dev.2` keeps one installable source:
+Version `0.4.0`, promoted from the unchanged `0.4.0-dev.2` runtime, keeps one installable source:
 
 - Choose callable `GM_setClipboard` when available; otherwise call `GM.setClipboard` with its receiver intact. Declare both clipboard and manager-info grant styles. There is one write attempt per activation, with no retry through another API.
 - Use Tampermonkey's known legacy callback only when identified. Await an actual returned thenable on either API. A modern API name does not imply a promise: [Greasemonkey documents a void return](https://wiki.greasespot.net/GM.setClipboard). Void dispatch remains explicitly unconfirmed.
@@ -48,6 +48,8 @@ Then use the [page structure probe](../tools/probe-console.js) in top-page devto
 
 ## Live test priority and evidence
 
+Reported workflow pass: Firefox 156.0 (64-bit), Proxmox VE 9.2.3, script 0.4.0-dev.2, multiple node Shell and LXC consoles. Browser/Proxmox versions are screenshot-backed; copy/paste results are maintainer-reported. Manager identity/version is pending. The rows below track complete per-manager qualification, not this narrower workflow result.
+
 | Priority | Combination | Status |
 | --- | --- | --- |
 | 1 | Firefox stable + Tampermonkey stable | Pending |
@@ -60,6 +62,6 @@ Then use the [page structure probe](../tools/probe-console.js) in top-page devto
 | 3 | Chrome stable + ScriptCat stable | Pending |
 | 4 | Chrome stable + OrangeMonkey stable | Pending |
 
-For each combination, run both probes and the full [live acceptance sequence](TESTING.md#live-acceptance-plan-not-yet-run) for node Shell and LXC. In particular, verify plain-text clipboard contents by pasting, Firefox callback invocation/destruction, reconnect/navigation, keyboard focus, and blocked clipboard behavior. Record a separate result per combination; a passing mock cannot promote a row. Pass all four priority-one and priority-two combinations before a general release claim, and retain explicit pending/failed labels on unaccepted extended targets. Browser preference does not establish a preferred manager; start with the maintainer's installed Firefox manager when that is known, keeping both primary manager targets in the gate.
+For each combination, run both probes and the full [live acceptance sequence](TESTING.md#remaining-live-acceptance-plan) for node Shell and LXC. In particular, verify plain-text clipboard contents by pasting, Firefox callback invocation/destruction, reconnect/navigation, keyboard focus, and blocked clipboard behavior. Record a separate result per combination; a passing mock cannot promote a row. Pass all four priority-one and priority-two combinations before claiming full primary browser/manager qualification, and retain explicit pending/failed labels on unaccepted extended targets. The 0.4.0 promotion decision is recorded separately in Testing. Browser preference does not establish a preferred manager; start with the maintainer's installed Firefox manager when that is known.
 
 For every tested Proxmox update, record `pve-manager` and `pve-xtermjs` versions. The pinned parser fixture in this repository is reproducible upstream-source evidence, not proof that every stable 9.2 installation ships those exact bytes. Refresh or add a fixture when an observed packaged console change warrants it; never fetch a floating latest bundle into tests automatically.

@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased — 0.4.0-dev.2
+## 0.4.0 — 2026-09-19
+
+- Promote the unchanged runtime from `0.4.0-dev.2` after the maintainer reported successful live copy/paste across several node Shell and LXC consoles, with expected text detail and correct current-console targeting.
+- Promotion changes the version and release description only; no copying behavior, permissions, dependencies, or installation scope changes.
+- Retain explicit evidence limits: this is a maintainer-reported workflow acceptance, not completion of the full browser/manager and edge-case matrix. See [Testing](docs/TESTING.md) for the report and remaining checks.
+
+## Earlier development — 0.4.0-dev.2 (unreleased)
 
 - Target current stable Proxmox VE, Chrome, and Firefox; document a ten-app survey and nine browser/manager test combinations, with all live results pending.
 - Add modern `GM.setClipboard` / `GM.info` capability support while retaining legacy manager APIs. Never retry a failed write through a second API.

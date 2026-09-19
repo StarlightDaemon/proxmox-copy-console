@@ -6,7 +6,7 @@
 
 ## Authoritative project documents
 
-- `proxmox-copy-console.user.js` — current implementation source; version 0.3.0 is the documented baseline.
+- `proxmox-copy-console.user.js` — current implementation source; version 0.4.0 is promoted from the live-tested 0.4.0-dev.2 runtime.
 - `README.md` — user-facing project overview.
 - `CHANGELOG.md` — version/baseline record.
 - `DECISIONS.md` — durable design decisions.
@@ -40,9 +40,9 @@ A tool's capability does not grant authority. If an API operation necessarily co
 
 ## Baseline protection
 
-Version 0.3.0 is the current documented baseline. Do not silently introduce 0.4.0 experimental behavior into it.
+Version 0.3.0 remains the historical baseline at commit `27a83d2ac836ef35c2f7e6644b6e448355631be0`. Do not rewrite its documented behavior or evidence.
 
-If work targets 0.4.0, identify it explicitly as future/unreleased work and keep current 0.3.0 behavior distinguishable.
+Version 0.4.0 promotes the unchanged 0.4.0-dev.2 runtime following the maintainer's live workflow acceptance. Preserve the scope and limitations of that evidence in `docs/TESTING.md`; do not imply that the full compatibility matrix has passed. Identify future experimental behavior as unreleased work.
 
 ## Verification discipline
 

@@ -42,6 +42,8 @@ Version 0.3.0 includes:
 
 ## 0.4.0
 
-0.4.0 remains unreleased. On 2026-09-18, development began as `0.4.0-dev.1`, following the repository review. It refines ownership, text fidelity, feedback, lifecycle behavior, and local verification. The source at commit `27a83d2ac836ef35c2f7e6644b6e448355631be0` preserves the 0.3.0 baseline. Development changes and locally executed tests are not live Proxmox acceptance; see [Testing](TESTING.md).
+On 2026-09-18, development began as `0.4.0-dev.1`, following the repository review. It refined ownership, text fidelity, feedback, lifecycle behavior, and local verification. The source at commit `27a83d2ac836ef35c2f7e6644b6e448355631be0` preserves the 0.3.0 baseline. Development changes and locally executed tests alone are not live Proxmox acceptance; see [Testing](TESTING.md).
 
-The same day's `0.4.0-dev.2` iteration establishes current stable Proxmox, Chrome, and Firefox as the target policy. It adds modern clipboard API selection, explicit Firefox object sharing, a userscript-context diagnostic, and a researched manager matrix while retaining one implementation. These remain development capabilities awaiting live acceptance.
+The same day's `0.4.0-dev.2` iteration established current stable Proxmox, Chrome, and Firefox as the target policy. It added modern clipboard API selection, explicit Firefox object sharing, a userscript-context diagnostic, and a researched manager matrix while retaining one implementation.
+
+The maintainer subsequently reported successful full copy/paste across several node Shell and LXC consoles, with expected detail and correct current-console targeting, and requested promotion. Version `0.4.0` preserves that tested runtime, changing only userscript metadata. The broader browser/manager qualification matrix and unreported edge-case scenarios remain open; Testing records the evidence limits.
