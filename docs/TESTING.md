@@ -8,6 +8,14 @@ Local verification on 2026-09-19: `node tools/check.cjs`, `node tools/fetch-xter
 
 Next live check: disable the temporary probe, replace the original script in FireMonkey with the candidate, retain trusted-host restrictions, and reload. Check one Copy button and actual pasted text on node Shell and LXC Console, then navigation and repeated copying. Recheck Firefox + Violentmonkey before promotion, with only one manager enabled at a time. Test Tampermonkey as a regression check, then the planned Chrome combinations. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
 
+[GitHub Actions passed for candidate commit 6d803b0](https://github.com/StarlightDaemon/proxmox-copy-console/actions/runs/35427181257). This is automated validation, not live acceptance.
+
+### Follow-up requiring an isolated run
+
+After receiving the candidate link, the maintainer supplied a log with the revision-2 manager probe still active and uncaught ExtJS/Proxmox errors: `timerId` accessed through an undefined `fireFn`, and `loadTags` called when `getController()` is null. The log does not establish the installed main script version or whether its Copy button worked. Its repeated `cloneCallback`, `anchorFilter`, and `buttonSome` failures come from the diagnostic probe, which intentionally exercises the old callback paths; they are not candidate regression results.
+
+Hold promotion. Disable the probe, confirm only candidate 0.4.1-dev.1 is enabled in FireMonkey, clear console output, and fully reload before checking node Shell and LXC Console. Record Copy presence, actual pasted output, and whether the two new errors recur. If they recur, disable both project scripts and fully reload for a baseline comparison. Do not attribute them to the candidate, probe, FireMonkey, or Proxmox without isolation evidence. Source review and passing mocks cannot exclude an interaction with native ExtJS event handling. No runtime change is made from this unisolated log; stable main remains 0.4.0.
+
 ## Current evidence: 0.4.0
 
 Version 0.4.0 promotes the unchanged runtime from 0.4.0-dev.2 following maintainer-reported live acceptance below. The historical 0.3.0 baseline is at commit `27a83d2ac836ef35c2f7e6644b6e448355631be0`. Source inspection, mock execution, real parser execution, CI, and user-reported live results are separate evidence classes.

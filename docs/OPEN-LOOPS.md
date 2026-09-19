@@ -12,6 +12,8 @@ The original R1-R7 implementation work is complete pending live validation: cons
 
 OL-04 implementation owner: originating agent `/root`, branch `codex/firemonkey-compat`, starting commit `0413765bcf1cd0aa09db4e60667bf9e034071ce6`. Scope: the callback boundaries demonstrated by the FireMonkey revision-2 live report; candidate 0.4.1-dev.1 requires live acceptance.
 
+OL-04 latest: candidate commit `6d803b0` passed CI. The subsequent maintainer log still contains the diagnostic probe and adds ExtJS `fireFn`/`timerId` and null-controller `loadTags` exceptions. Candidate version and Copy outcome are not confirmed by that log. Promotion is on hold pending the candidate-only fresh reload and, if errors persist, scripts-disabled baseline described in Testing. No further speculative runtime patch is queued.
+
 Items are unassigned unless an owner is recorded below. Claim one ID with an agent/task reference and starting commit before editing. Keep status and evidence with that ID; mark it done only when its completion criterion is met. Conditional items and ideas are not queued implementation work. Record failures and unavailable environments honestly.
 
 | ID | Priority / state | Follow-up and completion criterion |
