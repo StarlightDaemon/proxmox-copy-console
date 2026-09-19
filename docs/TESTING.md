@@ -12,7 +12,7 @@ The source is an unreleased development snapshot and remains unaccepted on a liv
 | 2026-09-18 | Actual xterm parser/buffer | Proxmox xterm 6.0.0 bundle, pinned revision in `tools/fetch-xterm.cjs`, Node without DOM renderer | Wrapping, wide glyphs, literal spaces, Unicode whitespace, emoji/combining text, scrollback, resize, alternate screen, and handler integration |
 | 2026-09-18 | Diagnostic probe | Mocked Proxmox page | Confirms structural reporting without reading buffer rows or emitting transcript/identity strings |
 | Pending | Live node Shell / LXC Console | Proxmox, browser, and userscript-manager versions to be recorded | No live execution or OS clipboard writes performed |
-| At snapshot preparation | GitHub Actions | Workflow configured | Remote execution not yet observed; consult [Actions](https://github.com/StarlightDaemon/proxmox-copy-console/actions) for results on the exact commit |
+| 2026-09-18 | GitHub Actions | Fresh Ubuntu / Node 24, commit `68c0f50` | [Checks passed](https://github.com/StarlightDaemon/proxmox-copy-console/actions/runs/35424235814), including fresh fixture download and the full test suite |
 
 The tests do not emulate Firefox compartments, browser same-origin enforcement, native ExtJS focus/layout, or extension clipboard permissions. The real xterm fixture executes its public parser and buffer API without `open()` or a renderer; it does not run Proxmox's websocket/termproxy code.
 
@@ -94,4 +94,4 @@ A clipboard timeout cannot cancel a manager operation. If encountered, inspect c
 
 ## Release gate
 
-Before labeling 0.4.0 accepted, pass local checks and record at least one real target configuration covering node Shell, LXC, text fidelity, alternate screens, navigation, and clipboard completion semantics. Record exact observed compatibility, including limitations. CI, mocks, and downloaded source are not manual Proxmox acceptance.
+Before labeling 0.4.0 accepted for general release, pass local checks and all four primary browser/manager rows in [Compatibility](COMPATIBILITY.md#live-test-priority-and-evidence): Firefox and Chrome, each with Tampermonkey and Violentmonkey. Each combination must cover node Shell, LXC, text fidelity, alternate screens, navigation, focus, and clipboard completion semantics. Record exact observed compatibility, including limitations; extended managers may remain explicitly unverified. CI, mocks, and downloaded source are not manual Proxmox acceptance.

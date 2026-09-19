@@ -70,6 +70,7 @@ The last two commands download a pinned, integrity-checked Proxmox xterm bundle 
 - [Review](docs/REVIEW-2026-09-18.md): findings that motivated this iteration.
 - [Research and next steps](docs/RESEARCH.md): upstream contracts, evidence, and remaining decisions.
 - [Compatibility](docs/COMPATIBILITY.md): current stable platform policy, manager survey, and sandbox probe.
+- [Open loops and agent handoff](docs/OPEN-LOOPS.md): remaining validation, conditional ideas, and a scoped follow-up assignment.
 - [Changelog](CHANGELOG.md): version status.
 - [AGENTS.md](AGENTS.md): repository mutation and evidence boundaries.
 

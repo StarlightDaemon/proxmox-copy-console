@@ -41,6 +41,8 @@ Other fixtures exercise Unicode whitespace, emoji, combining text, retained scro
 
 ## Next decisions after live evidence
 
+Track ownership, status, and completion criteria in [Open loops](OPEN-LOOPS.md). The points below explain the technical rationale rather than a second task queue.
+
 1. If the structure probe matches the expected ownership, keep the current strict resolver. If it fails, add only the smallest fallback justified by actual version-specific evidence, with a regression fixture. Do not restore global first-visible-frame copying.
 2. Test current stable Firefox first for the daily homelab workflow, then Chrome for compatibility, beginning with Tampermonkey and Violentmonkey as specified in the matrix. Both browsers remain in the general-release gate. The shared adapter now covers both GM API styles. Add manager-specific variants only for observed incompatibilities. Do not add a second write API as an automatic retry; a delayed original write could overwrite newer clipboard contents.
 3. Evaluate the guarded focus return with actual keyboard use. If it disrupts navigation, remove that convenience or narrow its condition before release.

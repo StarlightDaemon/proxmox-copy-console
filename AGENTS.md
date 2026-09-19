@@ -13,6 +13,7 @@
 - `docs/HISTORY.md` — documented project lineage.
 - `docs/DESIGN.md` — implementation design represented by the source.
 - `docs/TESTING.md` — verification scenarios and evidence boundaries.
+- `docs/OPEN-LOOPS.md` — follow-up register, completion criteria, and bounded agent handoff.
 - `LICENSE` — licensing terms.
 
 ## Mutation discipline
