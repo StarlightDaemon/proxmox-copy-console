@@ -10,11 +10,11 @@ The original R1-R7 implementation work is complete pending live validation: cons
 
 ## Follow-up register
 
-All items are initially unassigned. Claim one ID with an agent/task reference and starting commit before editing. Keep status and evidence with that ID; mark it done only when its completion criterion is met. Conditional items and ideas are not queued implementation work. Record failures and unavailable environments honestly.
+Items are unassigned unless an owner is recorded below. Claim one ID with an agent/task reference and starting commit before editing. Keep status and evidence with that ID; mark it done only when its completion criterion is met. Conditional items and ideas are not queued implementation work. Record failures and unavailable environments honestly.
 
 | ID | Priority / state | Follow-up and completion criterion |
 | --- | --- | --- |
-| OL-01 | Next / ready | Independent, bounded review of `pageOptions`, `writeClipboard`, and their callback/lifecycle interaction in the userscript. Inspect the existing compatibility tests. Return a reproducible finding and minimal fix if justified, or a concise no-change report identifying remaining browser-only uncertainty. Use the handoff below. This is an additional review, not a known defect. |
+| OL-01 | Done / reviewed 2026-09-18 | Agent `ol01_review` completed the scoped review from `c9219895b259c91f934dcdc350f4a08db66ebae9`; originating reviewer accepted the no-runtime-change result after independent code inspection and rerunning all 82 tests. See closure evidence below. Live acceptance rows remain open. |
 | OL-02 | Required / needs environment | Firefox-first live acceptance on the maintainer's Proxmox host. Obtain the actual installed manager/browser and `pve-manager`/`pve-xtermjs` versions. Run both probes and every applicable Testing scenario on node Shell and LXC. Record synthetic pasted output, native layout, focus, navigation/reconnect, hidden-page return, localized controls, and clipboard failure/timeout behavior. Complete both primary Firefox manager rows before closing. No credentials or access are supplied by this document. |
 | OL-03 | Required / needs environment | Chrome compatibility after initial Firefox validation. Complete both primary Chrome manager rows using the same source and acceptance sequence. Record real clipboard contents and exact versions. Firefox results cannot substitute for Chrome results. |
 | OL-04 | Extended / needs environment | Evaluate Greasemonkey, FireMonkey, ScriptCat, and OrangeMonkey in the remaining matrix rows. Record each result separately. Add an adapter or generated metadata variant only for a demonstrated incompatibility with a regression case; otherwise keep the shared script. Generic injectors and Safari remain outside the implementation plan. |
@@ -24,7 +24,15 @@ All items are initially unassigned. Claim one ID with an agent/task reference an
 | OL-08 | Idea / not planned | Optional explicit viewport-only copy. Revisit only for a demonstrated recurring need. Before coding, define scrolled-viewport semantics, wrapped-edge clipping, accessible activation, and code/UI cost against the simplicity policy. No hidden modifier-only gesture or additional copy modes by default. |
 | OL-09 | Required / awaiting OL-02 and OL-03 | Prepare a release-readiness review: resolve blockers, verify all four primary browser/manager rows, reconcile evidence and support claims, and rerun appropriate checks. Extended rows may remain explicitly unverified. This item prepares a decision; tagging, releasing, merging, and publication remain separate authority boundaries under AGENTS.md. |
 
-## Copy-ready first assignment: OL-01
+## OL-01 closure evidence
+
+- Delegate: `ol01_review`, using `gpt-5.6-terra`, in isolated branch `codex/ol-01-review` at `c9219895b259c91f934dcdc350f4a08db66ebae9`. No files changed in that checkout; no delegate commit or remote operation.
+- Scope: `pageOptions`, `writeClipboard`, Copy/feedback/destruction/focus interactions, and existing compatibility/console tests. No reproducible defect identified within this scope. Existing tests exercise callback/promise/void results, failures, timeout/late completion, no retry, cloned callback returns, teardown, and focus guards. This is a bounded code review, not a security certification.
+- Delegate validation: `node tools/check.cjs`; focused compatibility and console tests (60 passed); `node tools/fetch-xterm.cjs` (cached pinned fixture verified); `node --test --test-isolation=none tests/*.test.cjs` (82 passed); `git diff --check` (passed).
+- Originating reviewer: independently inspected the adapter, operation/lifecycle code, relevant tests, and clean delegate diff; reran syntax/metadata/size checks and the full suite (82 passed, zero failures/skips). Accepted the no-change conclusion. Source remains 17,327 bytes with the dev.2 SHA-256 recorded in Testing.
+- Residual evidence belongs to OL-02/OL-03: native Firefox compartment enforcement, extension callback delivery and teardown timing, and actual OS clipboard contents. No live compatibility row was advanced by this review.
+
+## Handoff used for OL-01 (completed; reference)
 
 A lighter coding model is suitable for this narrow code/test review. Bring any uncertain Firefox compartment or clipboard-contract conclusion back for review here. Do not give an agent the whole register as an instruction to implement everything.
 
