@@ -65,7 +65,7 @@ For each manager, keep the same script version and benign output, enable only on
 | 1 | Firefox stable + Tampermonkey stable | Pass, maintainer-reported: Tampermonkey 5.5.0 with script 0.4.0-dev.2 in the Firefox test round; fully tested and working, no issues reported |
 | 1 | Firefox stable + Violentmonkey stable | Workflow passed: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; remaining scenario qualification pending |
 | 2 | Firefox stable + Greasemonkey stable | Next Firefox round |
-| 2 | Firefox stable + FireMonkey stable | Unresolved: maintainer reports apparent failure with 3.8; popup lists the script under Other Scripts, with no Tab Scripts. Active-tab context and normal activation need confirmation; no runtime incompatibility established |
+| 2 | Firefox stable + FireMonkey stable | Workflow failed, cause unresolved: with 3.8 the Copy button never appeared on either node Shell or container Console. A separate popup port-matching issue was reproduced from upstream source; it does not establish injection failure. See Testing for probe follow-up |
 | 2 | Firefox stable + ScriptCat stable | Next Firefox round |
 | 3 | Chrome stable + Tampermonkey stable | Deferred by maintainer for this round |
 | 3 | Chrome stable + Violentmonkey stable MV3 | Deferred by maintainer for this round |
