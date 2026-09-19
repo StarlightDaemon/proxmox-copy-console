@@ -48,9 +48,9 @@ Then use the [page structure probe](../tools/probe-console.js) in top-page devto
 
 ## Live test priority and evidence
 
-Reported workflow pass: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3, script 0.4.0-dev.2, multiple node Shell and LXC consoles. Browser/manager/Proxmox versions are screenshot-backed; copy/paste results are maintainer-reported. The rows below distinguish that workflow result from complete per-manager qualification.
+Reported passes in the Firefox 156.0 (64-bit) / Proxmox VE 9.2.3 test round: **Violentmonkey 2.49.0** and **Tampermonkey 5.5.0**, both using script **0.4.0-dev.2**. Screenshots establish version details; the maintainer reports successful copy/paste across nodes and LXC consoles with Violentmonkey, and fully tested/working with no issues under Tampermonkey. See Testing for the evidence boundaries and unrecorded scenario details.
 
-Current test round (maintainer preference, 2026-09-19): **Firefox only**. Test Tampermonkey next, followed by Greasemonkey, FireMonkey, and ScriptCat as time permits. Chrome remains a compatibility target, with its testing deferred until the maintainer is ready; Firefox results do not establish Chrome support.
+Current test round (maintainer preference, 2026-09-19): **Firefox only**. Tampermonkey and Violentmonkey have passed the maintainer's practical testing. Next are Greasemonkey, FireMonkey, and ScriptCat as time permits. Chrome remains a compatibility target, with its testing deferred until the maintainer is ready; Firefox results do not establish Chrome support.
 
 For each manager, keep the same script version and benign output, enable only one manager/script installation for the Proxmox site at a time, and apply the same trusted-host restrictions. Run this short workflow check first:
 
@@ -62,7 +62,7 @@ For each manager, keep the same script version and benign output, enable only on
 
 | Priority | Combination | Status |
 | --- | --- | --- |
-| 1 | Firefox stable + Tampermonkey stable | Pending |
+| 1 | Firefox stable + Tampermonkey stable | Pass, maintainer-reported: Tampermonkey 5.5.0 with script 0.4.0-dev.2 in the Firefox test round; fully tested and working, no issues reported |
 | 1 | Firefox stable + Violentmonkey stable | Workflow passed: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; remaining scenario qualification pending |
 | 2 | Firefox stable + Greasemonkey stable | Next Firefox round |
 | 2 | Firefox stable + FireMonkey stable | Next Firefox round |

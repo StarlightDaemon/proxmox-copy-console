@@ -12,6 +12,7 @@ Version 0.4.0 promotes the unchanged runtime from 0.4.0-dev.2 following maintain
 | 2026-09-18 | Actual xterm parser/buffer | Proxmox xterm 6.0.0 bundle, pinned revision in `tools/fetch-xterm.cjs`, Node without DOM renderer | Wrapping, wide glyphs, literal spaces, Unicode whitespace, emoji/combining text, scrollback, resize, alternate screen, and handler integration |
 | 2026-09-18 | Diagnostic probe | Mocked Proxmox page | Confirms structural reporting without reading buffer rows or emitting transcript/identity strings |
 | 2026-09-18; versions supplied 2026-09-19 | Maintainer-reported live node Shell / LXC Console | Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3 | Successful full copy/paste with expected detail and correct current-console targeting on dev.2; version screenshots supplied, copying not independently observed by the coding agent |
+| 2026-09-19 | Maintainer-reported Tampermonkey follow-up | Tampermonkey 5.5.0, script 0.4.0-dev.2; continuing the Firefox 156.0 (64-bit) / Proxmox VE 9.2.3 test round | Maintainer reports fully tested and working, with no issues; screenshot confirms manager/script versions and enabled script |
 | 2026-09-18 | GitHub Actions | Fresh Ubuntu / Node 24, commit `68c0f50` | [Checks passed](https://github.com/StarlightDaemon/proxmox-copy-console/actions/runs/35424235814), including fresh fixture download and the full test suite |
 
 The tests do not emulate Firefox compartments, browser same-origin enforcement, native ExtJS focus/layout, or extension clipboard permissions. The real xterm fixture executes its public parser and buffer API without `open()` or a renderer; it does not run Proxmox's websocket/termproxy code.
@@ -62,9 +63,15 @@ On 2026-09-19 the maintainer supplied screenshots showing **Firefox 156.0 (64-bi
 
 No sanitized probe report, exact text comparison, or individual edge-case results were supplied. This report establishes observed Firefox user-workflow success, not completion of the full scenario checklist or manager matrix; Chrome and other unreported configurations remain unverified. Version 0.4.0 changes the userscript metadata only, preserving the tested runtime.
 
+### Tampermonkey follow-up — 2026-09-19
+
+Continuing the Firefox-only test round, the maintainer reported that the script was fully tested and working under Tampermonkey, with no issues to report. The supplied dashboard screenshot confirms **Tampermonkey 5.5.0**, **Proxmox Copy Console 0.4.0-dev.2**, and an enabled script. Firefox 156.0 (64-bit) and Proxmox VE 9.2.3 are carried forward from the previously supplied environment screenshots; they are not independently visible in this dashboard image.
+
+Record this as a successful maintainer-reported Tampermonkey test, alongside the Violentmonkey workflow pass. The coding agent did not operate the browser or independently observe this run. Individual scenario results and probe output were not supplied, so no additional per-scenario observations are inferred. Chrome and the other Firefox managers remain untested in this record.
+
 ## Remaining live acceptance plan
 
-Use the current stable Proxmox/browser policy and the nine combinations in [Compatibility](COMPATIBILITY.md#live-test-priority-and-evidence). Run the separate temporary [manager probe](../tools/probe-manager.user.js) inside each userscript manager before the top-page structure probe; do not confuse page devtools with the manager sandbox. The maintainer's report above does not by itself complete any full matrix row.
+Use the current stable Proxmox/browser policy and the nine combinations in [Compatibility](COMPATIBILITY.md#live-test-priority-and-evidence). The two primary Firefox managers now have successful maintainer reports. Further qualification can record individual scenario results and run the separate temporary [manager probe](../tools/probe-manager.user.js) inside each userscript manager before the top-page structure probe; do not confuse page devtools with the manager sandbox. Preserve the reported passes while keeping unrecorded scenario details distinct.
 
 Use benign synthetic output, a scratch plain-text destination, and one enabled script version. Record script SHA-256 (`node tools/check.cjs`), Proxmox/pve-xtermjs package versions, browser/manager versions, language, date, and actual results. Use the pinned 0.3.0 source as a rollback point; no server file changes are needed.
 
