@@ -28,6 +28,12 @@ Items are unassigned unless an owner is recorded below. Claim one ID with an age
 | OL-08 | Idea / not planned | Optional explicit viewport-only copy. Revisit only for a demonstrated recurring need. Before coding, define scrolled-viewport semantics, wrapped-edge clipping, accessible activation, and code/UI cost against the simplicity policy. No hidden modifier-only gesture or additional copy modes by default. |
 | OL-09 | Done / 0.4.0 readiness reviewed | Maintainer approved source promotion after the live Firefox/node/LXC report. Runtime body is identical to tested dev.2; all 82 tests and metadata/documentation checks passed. The tested combination is Firefox 156.0 (64-bit), Violentmonkey 2.49.0, and Proxmox VE 9.2.3. Broader qualification remains in OL-02/OL-03. Source is promoted on main; tag/release publication awaits explicit authorization after automatic approval review rejected that separate operation. |
 
+## OL-10 — environmental UI exception investigation
+
+Open, bounded follow-up outside the copy runtime. Repeated `fireFn`/`timerId` and null-controller `loadTags` errors appear during navigation in both candidate runs and a supplied scripts-disabled baseline, while copying is reported functional. The latest reviewed excerpt contains six timer exceptions and four tag exceptions. See Testing for upstream source paths and evidence limits.
+
+If pursued, reproduce the same navigation in a clean Firefox profile with all extensions disabled, record exact browser/Proxmox versions and minimal steps, and compare with the existing profile. Investigate delayed view destruction and status-store callbacks only after reproduction. Close with either an isolated cause and appropriate upstream fix/workaround, or a documented inability to reproduce. Do not hide console errors, change privacy settings, or add Proxmox patches to Copy Console merely to silence the log. No upstream report has been sent.
+
 ## OL-01 closure evidence
 
 - Delegate: `ol01_review`, using `gpt-5.6-terra`, in isolated branch `codex/ol-01-review` at `c9219895b259c91f934dcdc350f4a08db66ebae9`. No files changed in that checkout; no delegate commit or remote operation.
