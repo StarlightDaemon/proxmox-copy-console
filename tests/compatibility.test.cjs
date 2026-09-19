@@ -115,3 +115,62 @@ test('unavailable Firefox sharing does not silently inject or evaluate page code
     assert.equal(h.warnings.length, 1);
     assert.equal(h.copied.length, 0);
 });
+
+test('discovery avoids page-array filter and some callbacks under strict compartments', async () => {
+    const view = consoleView();
+    const views = [view];
+    const rejectCallback = () => { throw Error('page cannot invoke sandbox callback'); };
+    views.map = fn => {
+        const anchors = Array.prototype.map.call(views, fn);
+        anchors.filter = rejectCallback;
+        return anchors;
+    };
+    view.toolbar.items.items.some = rejectCallback;
+    const h = host({ views });
+    assert.equal(h.created.length, 1);
+    assert.equal(h.warnings.length, 0);
+    h.scan();
+    assert.equal(h.created.length, 1, 'repeated discovery does not duplicate controls');
+    await h.click();
+    assert.deepEqual(h.copied, ['retained output']);
+});
+
+test('explicit Firefox exports work without function cloning and contain callback return values', async () => {
+    const targets = [], exports = [];
+    const h = host({ views: [consoleView()], globals: {
+        cloneInto(value, target, settings) {
+            assert.equal(settings, undefined, 'never request the failing cloneFunctions path');
+            assert.equal(Object.values(value).some(item => typeof item === 'function'), false);
+            targets.push(target);
+            return { ...value };
+        },
+        exportFunction(callback, target) {
+            targets.push(target);
+            exports.push(callback);
+            return (...args) => callback(...args);
+        },
+    } });
+    assert.equal(exports.length, 2, 'copy and destroy handlers are exported');
+    assert.equal(targets.every(target => target === h.context.unsafeWindow), true);
+    const untrustedArgument = new Proxy({}, { get() { throw Error('must not inspect page arguments'); } });
+    assert.equal(h.created[0].handler(untrustedArgument), undefined);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(h.copied, ['retained output']);
+    h.created[0].destroy();
+    assert.equal(h.api.controls.size, 0);
+    assert.equal(h.timers.size, 0);
+});
+
+test('failed explicit export is contained without fallback or clipboard writes', () => {
+    let clones = 0, exports = 0;
+    const h = host({ views: [consoleView()], globals: {
+        cloneInto(value) { clones++; return { ...value }; },
+        exportFunction() { exports++; throw Error('PRIVATE FAILURE'); },
+    } });
+    assert.equal(clones, 1);
+    assert.equal(exports, 1);
+    assert.equal(h.created.length, 0);
+    assert.equal(h.copied.length, 0);
+    assert.equal(h.warnings.length, 1);
+    assert.equal(JSON.stringify(h.warnings).includes('PRIVATE'), false);
+});

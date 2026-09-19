@@ -1,5 +1,13 @@
 # Testing
 
+## Candidate: 0.4.1-dev.1
+
+Branch `codex/firemonkey-compat` starts at `0413765bcf1cd0aa09db4e60667bf9e034071ce6`. The candidate uses local discovery loops and separate function exports to address the live FireMonkey failures recorded below. Stable 0.4.0 remains on main. This candidate has not yet passed live testing.
+
+Local verification on 2026-09-19: `node tools/check.cjs`, `node tools/fetch-xterm.cjs` (cached pinned fixture verified), `node --test --test-isolation=none tests/*.test.cjs` (**88 passed, zero failures/skips**), and `git diff --check` passed. The three new compatibility regressions cover rejected page-array callbacks, explicit function exports with no privileged return values, and contained export failure. Candidate source is **18,224 bytes**, SHA-256 `d170fb0e7156ede5120ece560404891d9fb3180eba57e7600b1d6d708457b6ff`. Mocks check our contracts, not native Firefox compartments or real clipboard behavior.
+
+Next live check: disable the temporary probe, replace the original script in FireMonkey with the candidate, retain trusted-host restrictions, and reload. Check one Copy button and actual pasted text on node Shell and LXC Console, then navigation and repeated copying. Recheck Firefox + Violentmonkey before promotion, with only one manager enabled at a time. Test Tampermonkey as a regression check, then the planned Chrome combinations. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
+
 ## Current evidence: 0.4.0
 
 Version 0.4.0 promotes the unchanged runtime from 0.4.0-dev.2 following maintainer-reported live acceptance below. The historical 0.3.0 baseline is at commit `27a83d2ac836ef35c2f7e6644b6e448355631be0`. Source inspection, mock execution, real parser execution, CI, and user-reported live results are separate evidence classes.
@@ -77,11 +85,11 @@ Source investigation found a separate popup-matching issue in [FireMonkey 3.8 ma
 
 Follow-up evidence: the maintainer fully disabled Tampermonkey and Violentmonkey. Their Proxmox screenshot shows the original script's fixed integration warning and a disabled manager probe. After enabling the probe, they supplied JSON identifying FireMonkey, with `legacyClipboard`, `modernClipboard`, `cloneInto`, `proxmoxGlobal`, `extQuery`, and `extCreate` all true and `pagePath: unsafeWindow`. The original script still logs `Console integration unavailable; retrying automatically`. This establishes startup and API/global availability in the manager sandbox; it does not establish successful API invocation, cloning, component discovery, or clipboard writes. Host addresses and unrelated terminal/browser output are omitted from this record.
 
-Next check: replace the temporary [manager probe](../tools/probe-manager.user.js) with diagnostic revision 2, save/enable it, and reload with the intended Proxmox console open. Collect the second JSON report, `proxmox-copy-console/integration/2`, after five seconds. It independently checks cloning, query/iteration, anchor visibility/identity, toolbar membership, page-array filter/some callbacks, and owner/frame presence without creating controls or reading terminal text. Keep the original script enabled and other managers disabled. Popup categorization alone cannot establish injection failure. Keep effective host restrictions intact; disable/remove the probe after diagnosis.
+Revision-2 live result supplied by the maintainer: `clonePlain`, `query`, `iterate`, and `inspect` passed. For one supported anchor, identity, toolbar membership, and owner/frame checks passed; `anchorFilter` and `buttonSome` each failed with `Error`. `cloneCallback` failed with `TypeError`; that combined check covers both cloning and invocation, so its exact internal failure point is not established. These results demonstrate callback-boundary failures and motivate the candidate above. Explicit `exportFunction` behavior, actual button creation, and clipboard copying in FireMonkey still require live acceptance. Popup categorization alone cannot establish injection failure.
 
 Revision-2 local validation: all five probe tests passed, covering delayed discovery, callback/clone failure isolation, inaccessible exception properties, and absence of terminal/identity leakage, clipboard calls, or UI creation in the mocks. Syntax, metadata, size, local links, and whitespace checks passed. These tests do not reproduce native Firefox compartments. Production 0.4.0 remains unchanged; no fix is claimed before live diagnostic evidence.
 
-[FireMonkey's help](https://erosman.github.io/firemonkey/src/content/help.html) describes Tab Scripts as the active-tab list and provides registration errors in script Information. Its manual Run action does not process userscript metadata or supply GM APIs; use normal saved-script activation for this test. No source change or compatibility variant is justified by the evidence so far.
+[FireMonkey's help](https://erosman.github.io/firemonkey/src/content/help.html) describes Tab Scripts as the active-tab list and provides registration errors in script Information. Its manual Run action does not process userscript metadata or supply GM APIs; use normal saved-script activation for this test. The latest live callback failures justify the candidate above, while a separate manager edition has not been needed.
 
 ## Remaining live acceptance plan
 

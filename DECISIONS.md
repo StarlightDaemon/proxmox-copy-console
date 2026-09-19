@@ -4,7 +4,7 @@ This file records durable decisions represented by the 0.3.0 baseline. Future id
 
 ## Product scope and simplicity
 
-The product has one job: copy the intended Proxmox console's retained text accurately through one native Copy button. Firefox's daily homelab workflow leads; Chrome compatibility remains required.
+The product has one job: copy the intended Proxmox console's retained text accurately through one native Copy button. Firefox + Violentmonkey is the maintainer's primary daily homelab combination; Chrome compatibility remains required.
 
 Accept an addition only when it solves a demonstrated problem in that copying workflow and its benefit justifies the code, permissions, interface, and ongoing maintenance it adds. Prioritize correctness, reliable targeting, useful failure feedback, and small compatibility fixes. Optional copying features need evidence of recurring use; a plausible idea alone does not put one on the roadmap.
 
@@ -53,5 +53,11 @@ These choices were implemented in 0.4.0-dev.2 and promoted without runtime chang
 - **Share one implementation across managers.** Select legacy/modern clipboard capabilities before a write; export Firefox callbacks/configuration only when the sandbox provides `cloneInto`. Keep callbacks free of page arguments and privileged return values. Add a generated variant only when an actual manager incompatibility requires one; do not maintain ten manual forks to match an arbitrary app count. See [Compatibility](docs/COMPATIBILITY.md).
 
 ## Deferred
+
+### Compatibility test scope clarified 2026-09-19
+
+Keep a shared source where small, evidenced compatibility changes suffice. Offer generated manager-specific variants only if shared behavior cannot remain reliable and lean; separate editions need their own acceptance. The unreleased 0.4.1-dev.1 candidate addresses FireMonkey callback boundaries without requiring a manager fork. Verify Firefox + Violentmonkey again before promoting it.
+
+Use Chrome as the representative Chromium test browser. Other Chromium browsers are expected-compatible by maintainer policy, with no routine broad test matrix, but remain unverified unless actually exercised. Investigate a derivative browser when a concrete report warrants it. Chrome testing is still pending; this policy does not turn Firefox evidence into a Chrome pass.
 
 Viewport-only copying is an uncommitted idea, not a planned feature. Revisit only if daily use demonstrates a need, then define scrolled-viewport semantics, wrapped edges, and an accessible activation method within the simplicity policy. No broad compatibility fallback is added without probe evidence from the target installation.

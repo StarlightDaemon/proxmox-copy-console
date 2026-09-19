@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Proxmox Copy Console
 // @namespace    homelab
-// @version      0.4.0
-// @description  Copies the retained buffer of an embedded Proxmox xterm console.
+// @version      0.4.1-dev.1
+// @description  Development candidate: FireMonkey callback compatibility for Proxmox console copying.
 // @include      https://*:8006/*
 // @grant        GM_setClipboard
 // @grant        GM_info
@@ -37,14 +37,23 @@
     function pageOptions(options) {
         if (typeof cloneInto !== 'function') return options;
         const shared = { ...options };
+        const callbacks = {};
         for (const key of Object.keys(shared)) {
             if (typeof shared[key] === 'function') {
                 // These callbacks take no page arguments and return no sandbox
                 // objects (including privileged promises) to the page.
-                shared[key] = () => { void options[key](); };
+                callbacks[key] = () => { void options[key](); };
+                delete shared[key];
             }
         }
-        return cloneInto(shared, page, { cloneFunctions: true });
+        // FireMonkey's function-cloning bridge differs from plain cloneInto.
+        // Export functions separately when the manager exposes Firefox's API.
+        if (typeof exportFunction === 'function') {
+            const result = cloneInto(shared, page);
+            for (const key of Object.keys(callbacks)) result[key] = exportFunction(callbacks[key], page);
+            return result;
+        }
+        return cloneInto({ ...shared, ...callbacks }, page, { cloneFunctions: true });
     }
 
     // Restrict installation to trusted hosts in the userscript manager. Page
@@ -109,7 +118,13 @@
         const toolbar = anchor.up('toolbar');
         if (!toolbar?.items?.items.includes(anchor)) return null;
         const candidates = anchors || page.Ext.ComponentQuery.query('pveConsoleButton');
-        if (candidates.filter(item => !item.destroyed && item.up('toolbar') === toolbar).length !== 1) return null;
+        let anchorCount = 0;
+        // Iterate locally: page-array methods cannot invoke sandbox callbacks
+        // in managers with strict Firefox compartment boundaries.
+        for (const item of candidates) {
+            if (!item.destroyed && item.up('toolbar') === toolbar) anchorCount++;
+        }
+        if (anchorCount !== 1) return null;
         const owner = toolbar?.ownerCt;
         const root = owner?.getEl()?.dom;
         if (!root || owner.destroyed || toolbar.destroyed) return null;
@@ -356,8 +371,12 @@
                     }
                     const current = resolveConsole(anchor, anchors);
                     if (state) updateAvailability(state, !!current);
-                    else if (current && !toolbar.items.items.some(item => !item.destroyed && item.pveCopyConsoleButton)) {
-                        createControl(Ext, anchor, toolbar);
+                    else if (current) {
+                        let existing = false;
+                        for (const item of toolbar.items.items) {
+                            if (!item.destroyed && item.pveCopyConsoleButton) { existing = true; break; }
+                        }
+                        if (!existing) createControl(Ext, anchor, toolbar);
                     }
                 } catch {
                     const state = controls.get(toolbar);

@@ -6,7 +6,7 @@
 
 ## Authoritative project documents
 
-- `proxmox-copy-console.user.js` — current implementation source; version 0.4.0 is promoted from the live-tested 0.4.0-dev.2 runtime.
+- `proxmox-copy-console.user.js` — this branch's unreleased 0.4.1-dev.1 compatibility candidate; stable main retains 0.4.0, promoted from the live-tested 0.4.0-dev.2 runtime.
 - `README.md` — user-facing project overview.
 - `CHANGELOG.md` — version/baseline record.
 - `DECISIONS.md` — durable design decisions.

@@ -2,6 +2,8 @@
 
 ## Target platform
 
+Maintainer priority, clarified 2026-09-19: **Firefox + Violentmonkey** is the primary daily-use combination. Keep a shared script when small compatibility changes suffice. Chrome is the representative Chromium browser for later testing; other Chromium browsers are expected-compatible by policy but unverified unless exercised. Do not add routine derivative-browser test matrices without a concrete issue.
+
 **Firefox is the primary development and acceptance browser**, reflecting the maintainer's daily homelab workflow. **Chrome is the secondary compatibility target**. Start investigation and usability checks in Firefox, especially sandbox access, clipboard behavior, keyboard focus, and navigation; verify the same behavior in Chrome before claiming cross-browser qualification. Keep one shared implementation. The maintainer approved 0.4.0 promotion after live node/LXC copy-paste testing; this does not complete the wider matrix.
 
 Target the latest **stable Proxmox VE**, with its standard web UI and packaged xterm console, on current stable desktop **Chrome and Firefox**. As researched on 2026-09-18, the current release line is **Proxmox VE 9.2**, announced on May 21, 2026 ([official release](https://www.proxmox.com/en/about/company-details/press-releases/proxmox-virtual-environment-9-2), [downloads](https://www.proxmox.com/en/downloads/proxmox-virtual-environment)). Record the actual installed package versions; the release line alone does not identify the console bundle.
@@ -28,6 +30,8 @@ There is no verified cross-store top-ten ranking. The survey below prioritizes f
 Six manager families produce **nine browser/manager combinations** to investigate. The additional four survey entries do not become supported simply to fill a number. Browser availability and extension maintenance must be rechecked at the time of testing, using the publisher's stable installation links.
 
 ## One script, small compatibility adapters
+
+This branch's unreleased **0.4.1-dev.1** candidate replaces page-array callbacks with local loops and separates configuration cloning from function export where `exportFunction` exists. The remaining 0.4.0 adapter description below records stable behavior; candidate live acceptance is pending. Recheck Firefox + Violentmonkey before promotion.
 
 Version `0.4.0`, promoted from the unchanged `0.4.0-dev.2` runtime, keeps one installable source:
 
@@ -65,7 +69,7 @@ For each manager, keep the same script version and benign output, enable only on
 | 1 | Firefox stable + Tampermonkey stable | Pass, maintainer-reported: Tampermonkey 5.5.0 with script 0.4.0-dev.2 in the Firefox test round; fully tested and working, no issues reported |
 | 1 | Firefox stable + Violentmonkey stable | Workflow passed: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; remaining scenario qualification pending |
 | 2 | Firefox stable + Greasemonkey stable | Next Firefox round |
-| 2 | Firefox stable + FireMonkey stable | Workflow failed, integration cause unresolved: with 3.8 the Copy button never appeared on either node Shell or container Console. Maintainer probe confirms startup and required API/global presence; runtime logs an integration warning. A separate popup port-matching issue is misleading. See Testing for revision-2 probe follow-up |
+| 2 | Firefox stable + FireMonkey stable | Stable workflow failed: 3.8 shows no Copy button. Revision-2 live probe reports callback-cloning and page-array filter/some failures; discovery and owner/frame presence pass. Candidate 0.4.1-dev.1 addresses these paths; live acceptance pending. Popup port-matching issue remains separate |
 | 2 | Firefox stable + ScriptCat stable | Next Firefox round |
 | 3 | Chrome stable + Tampermonkey stable | Deferred by maintainer for this round |
 | 3 | Chrome stable + Violentmonkey stable MV3 | Deferred by maintainer for this round |

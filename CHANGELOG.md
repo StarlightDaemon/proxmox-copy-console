@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1-dev.1 — unreleased
+
+- Address FireMonkey's observed rejection of sandbox callbacks passed to page-owned array `filter`/`some` methods by using local loops for anchor counting and duplicate-button checks.
+- When available, use Firefox `exportFunction` for no-argument/no-return handlers and clone configuration data separately. Preserve the existing clone-functions path for managers without that API.
+- Keep the shared script, permissions, clipboard behavior, and installation scope. Add regression cases for strict callback boundaries and export failure containment. FireMonkey and Firefox/Violentmonkey live acceptance remain pending; stable 0.4.0 is unchanged on main.
+
 ## 0.4.0 — 2026-09-19
 
 - Promote the unchanged runtime from `0.4.0-dev.2` after the maintainer reported successful live copy/paste across several node Shell and LXC consoles, with expected text detail and correct current-console targeting.
