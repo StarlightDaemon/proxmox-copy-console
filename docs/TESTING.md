@@ -2,21 +2,23 @@
 
 ## Candidate: 0.4.1-dev.1
 
-Branch `codex/firemonkey-compat` starts at `0413765bcf1cd0aa09db4e60667bf9e034071ce6`. The candidate uses local discovery loops and separate function exports to address the live FireMonkey failures recorded below. Stable 0.4.0 remains on main. This candidate has not yet passed live testing.
+Branch `codex/firemonkey-compat` starts at `0413765bcf1cd0aa09db4e60667bf9e034071ce6`. The candidate uses local discovery loops and separate function exports to address the live FireMonkey failures recorded below. Stable 0.4.0 remains on main. The maintainer reports successful copying in FireMonkey; full candidate acceptance and primary Firefox/Violentmonkey regression testing remain pending.
 
 Local verification on 2026-09-19: `node tools/check.cjs`, `node tools/fetch-xterm.cjs` (cached pinned fixture verified), `node --test --test-isolation=none tests/*.test.cjs` (**88 passed, zero failures/skips**), and `git diff --check` passed. The three new compatibility regressions cover rejected page-array callbacks, explicit function exports with no privileged return values, and contained export failure. Candidate source is **18,224 bytes**, SHA-256 `d170fb0e7156ede5120ece560404891d9fb3180eba57e7600b1d6d708457b6ff`. Mocks check our contracts, not native Firefox compartments or real clipboard behavior.
 
-Next live check: disable the temporary probe, replace the original script in FireMonkey with the candidate, retain trusted-host restrictions, and reload. Check one Copy button and actual pasted text on node Shell and LXC Console, then navigation and repeated copying. Recheck Firefox + Violentmonkey before promotion, with only one manager enabled at a time. Test Tampermonkey as a regression check, then the planned Chrome combinations. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
+Next live check: disable FireMonkey and the temporary probe, install the same candidate in Violentmonkey with trusted-host restrictions preserved, and reload. Check one Copy button and actual pasted text on node Shell and LXC Console, then navigation and repeated copying. Recheck Firefox + Violentmonkey before promotion, with only one manager enabled at a time. Test Tampermonkey as a regression check, then the planned Chrome combinations. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
 
 [GitHub Actions passed for candidate commit 6d803b0](https://github.com/StarlightDaemon/proxmox-copy-console/actions/runs/35427181257). This is automated validation, not live acceptance.
 
-### Follow-up requiring an isolated run
+### FireMonkey copying and baseline comparison
 
 After receiving the candidate link, the maintainer supplied a log with the revision-2 manager probe still active and uncaught ExtJS/Proxmox errors: `timerId` accessed through an undefined `fireFn`, and `loadTags` called when `getController()` is null. The log does not establish the installed main script version or whether its Copy button worked. Its repeated `cloneCallback`, `anchorFilter`, and `buttonSome` failures come from the diagnostic probe, which intentionally exercises the old callback paths; they are not candidate regression results.
 
 The maintainer then responded to the candidate-only reload request with a log containing no probe reports and explicitly stated **Copy worked**. Both `fireFn`/`timerId` and null-controller `loadTags` exceptions still recur. Record this as maintainer-reported copying success in the candidate-only test, with unresolved UI errors; the report does not itemize copy/paste fidelity or separate node/LXC outcomes. It rules out an actively running probe as the sole explanation for the repeated errors, but does not establish their cause.
 
-Hold promotion pending a baseline comparison: disable the Copy Console candidate too, keep the probe and other managers disabled, clear console output, fully reload, and repeat the same node/LXC navigation. Record whether either exception recurs. Do not attribute them to the candidate, FireMonkey, or Proxmox without that comparison. Source review and passing mocks cannot exclude an interaction with native ExtJS event handling. No further runtime change is made from these logs; stable main remains 0.4.0. Firefox + Violentmonkey regression acceptance is still outstanding.
+In response to the requested scripts-disabled baseline comparison, the maintainer supplied another log containing both `fireFn`/`timerId` and null-controller `loadTags` exceptions, with no project script/probe messages. Treat this as the reported baseline run based on the conversational context; the log itself does not independently verify extension toggles. The same exceptions occurring in that comparison suggests they are not introduced by the candidate. Their underlying page/extension cause remains undiagnosed; do not label them a confirmed Proxmox bug or patch unrelated page behavior in this userscript.
+
+No further runtime change is justified by these errors alone. Continue the primary Firefox + Violentmonkey regression check before promotion. Preserve FireMonkey's reported copying success without claiming complete scenario coverage. Stable main remains 0.4.0.
 
 ## Current evidence: 0.4.0
 
