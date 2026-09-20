@@ -54,7 +54,7 @@ Then use the [page structure probe](../tools/probe-console.js) in top-page devto
 
 Reported passes in the Firefox 156.0 (64-bit) / Proxmox VE 9.2.3 test round: **Violentmonkey 2.49.0** and **Tampermonkey 5.5.0**, both using script **0.4.0-dev.2**. Screenshots establish version details; the maintainer reports successful copy/paste across nodes and LXC consoles with Violentmonkey, and fully tested/working with no issues under Tampermonkey. See Testing for the evidence boundaries and unrecorded scenario details.
 
-Current test round (maintainer preference, 2026-09-19): **operator-run Chrome testing** after canceling the computer-control attempt. Chrome + Tampermonkey has a reported candidate workflow pass; exact browser/manager versions remain pending. Chrome + Violentmonkey is next. Preserve the earlier Firefox results separately; Firefox + Tampermonkey still needs a candidate regression, and ScriptCat remains a future check.
+Current test round (maintainer preference, 2026-09-19): **operator-run Chrome testing** after canceling the computer-control attempt. Chrome + Tampermonkey and Chrome + Violentmonkey both have reported candidate workflow passes. Chrome is reported as the latest official public-channel build; exact browser/manager versions remain pending. Preserve the earlier Firefox results separately; Firefox + Tampermonkey still needs a candidate regression, and ScriptCat remains a future check.
 
 For each manager, keep the same script version and benign output, enable only one manager/script installation for the Proxmox site at a time, and apply the same trusted-host restrictions. Run this short workflow check first:
 
@@ -72,7 +72,7 @@ For each manager, keep the same script version and benign output, enable only on
 | 2 | Firefox stable + FireMonkey stable | Stable workflow failed: 3.8 shows no Copy button. Candidate 0.4.1-dev.1: maintainer reports Copy worked with probe disabled. ExtJS fireFn/timerId and loadTags errors also appear in the supplied scripts-disabled baseline; candidate-specific cause not established. Full scenario qualification pending; popup port-matching issue remains separate |
 | 2 | Firefox stable + ScriptCat stable | Next Firefox round |
 | 3 | Chrome stable + Tampermonkey stable | Workflow passed, maintainer-reported: candidate 0.4.1-dev.1 Copy button, menu navigation, and leaving/returning to the site worked with no observed functional issues. Exact Chrome/manager versions and full scenario qualification pending; see Testing for screenshot notices |
-| 3 | Chrome stable + Violentmonkey stable MV3 | Next operator-run candidate test |
+| 3 | Chrome stable + Violentmonkey stable MV3 | Workflow passed, maintainer-reported: all testing with candidate 0.4.1-dev.1 went fine without issue. Latest official public-channel Chrome reported; numeric browser/manager versions, installed manifest, and full scenario qualification remain unrecorded. Same form/unload issue categories as the Tampermonkey run |
 | 4 | Chrome stable + ScriptCat stable | Deferred by maintainer for this round |
 | 4 | Chrome stable + OrangeMonkey stable | Deferred by maintainer for this round |
 
