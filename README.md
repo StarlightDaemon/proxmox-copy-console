@@ -53,6 +53,8 @@ The script does not read the clipboard back or retry writes automatically. After
 
 Targets current stable **Proxmox VE** through its main HTTPS interface on port **8006**, using embedded node Shell and LXC xterm consoles.
 
+**Custom port?** Update both the `@include` rule and the script's `location.port` check to match your browser URL; changing the include rule alone is not enough. Custom-port setups remain untested.
+
 Practical copy/paste and navigation tests passed in **Firefox and Chrome**, each with **Violentmonkey and Tampermonkey**. Firefox + Violentmonkey is the primary combination. See [test coverage](docs/TESTING.md) for versions and limits.
 
 Standalone console windows, noVNC/SPICE, PDM remote consoles, and custom proxy ports are outside the supported scope. Other browsers and managers are outside the current testing focus; see [compatibility details](docs/COMPATIBILITY.md).
