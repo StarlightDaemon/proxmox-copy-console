@@ -1,6 +1,6 @@
 # Decisions
 
-This file records durable decisions represented by the 0.3.0 baseline. Future ideas are not accepted merely because they are listed as possible 0.4.0 work.
+This file records durable decisions by version. Historical sections preserve their original rationale; current compatibility and evidence are summarized in [Testing](docs/TESTING.md). An idea is not accepted merely because it appears in a historical proposal.
 
 ## Product scope and simplicity
 
@@ -50,7 +50,7 @@ These choices were implemented in 0.4.0-dev.2 and promoted without runtime chang
 - **Restore focus conservatively.** Only the same focused button and same active terminal qualify. Do not intercept terminal keyboard shortcuts.
 - **Keep trust configuration outside a new settings system.** Document manager-level host restrictions; preserve userscript identity and do not introduce an auto-update channel.
 - **Target rolling stable platforms, Firefox first.** Current stable Proxmox VE with its standard console packages is the intended platform. Firefox is the primary development/acceptance browser for the maintainer's daily homelab workflow; Chrome is the secondary compatibility target. Both require evidence before claiming cross-browser qualification. The maintainer approved 0.4.0 promotion on the reported live workflow while remaining matrix coverage stays open. Prioritize Tampermonkey/Violentmonkey and test additional manager families separately. Do not maintain legacy-version shims speculatively.
-- **Share one implementation across managers.** Select legacy/modern clipboard capabilities before a write; export Firefox callbacks/configuration only when the sandbox provides `cloneInto`. Keep callbacks free of page arguments and privileged return values. Add a generated variant only when an actual manager incompatibility requires one; do not maintain ten manual forks to match an arbitrary app count. See [Compatibility](docs/COMPATIBILITY.md).
+- **Share one implementation across managers.** Select legacy/modern clipboard capabilities before a write; export Firefox callbacks/configuration only when the sandbox provides `cloneInto`. Keep callbacks free of page arguments and privileged return values. Add a generated variant only when an actual manager incompatibility requires one; do not maintain ten manual forks to match an arbitrary app count. See [Testing and compatibility](docs/TESTING.md).
 
 ## Deferred
 

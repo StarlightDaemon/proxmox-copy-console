@@ -1,5 +1,7 @@
 # Research and implementation strategy
 
+> Historical record archived from commit `e22006728b7b7262f6efe2d32c1da24f36ddc9ae`. Status statements and plans below describe their original checkpoints, not the current release or work queue. See the [current documentation](../README.md).
+
 Recorded 2026-09-18 for `0.4.0-dev.2`, promoted to `0.4.0` with unchanged runtime following maintainer-reported live acceptance. This document links API evidence to implementation choices and identifies remaining validation. The [compatibility policy and ten-app survey](COMPATIBILITY.md) add current stable Proxmox, Chrome, Firefox, and manager-specific primary sources.
 
 ## Upstream contracts inspected
@@ -14,7 +16,7 @@ Recorded 2026-09-18 for `0.4.0-dev.2`, promoted to `0.4.0` with unchanged runtim
 | [Tampermonkey clipboard API](https://www.tampermonkey.net/documentation.php?locale=en&q=GM_setClipboard) | Legacy API supports a completion callback | Use callback confirmation only for an identified compatible manager |
 | [Violentmonkey clipboard implementation](https://github.com/violentmonkey/violentmonkey/blob/1fed91eabe35c9724e2c7858f2b24ad6844de7d5/src/injected/web/gm-api.js) | Legacy `GM_setClipboard` posts a bridge message without returning completion | Report dispatch as unconfirmed; do not hang waiting for an unsupported callback |
 
-These are source/API observations, not proof of Firefox sandbox behavior or compatibility with a specific installed Proxmox release. The structural association remains the main live-test risk. A read-only [probe](../tools/probe-console.js) makes that risk inspectable before adding fallback logic.
+These are source/API observations, not proof of Firefox sandbox behavior or compatibility with a specific installed Proxmox release. The structural association remains the main live-test risk. A read-only [probe](../../tools/probe-console.js) makes that risk inspectable before adding fallback logic.
 
 ## Real-parser experiment
 

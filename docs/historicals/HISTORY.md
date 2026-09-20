@@ -1,5 +1,7 @@
 # Project History
 
+> Historical record archived from commit `e22006728b7b7262f6efe2d32c1da24f36ddc9ae`. Status statements and plans below describe their original checkpoints, not the current release or work queue. See the [current documentation](../README.md).
+
 ## Selection-driven lineage
 
 The project previously explored a select-to-copy approach for Proxmox xterm consoles.

@@ -57,13 +57,13 @@ Targets current stable **Proxmox VE** through its main HTTPS interface on port *
 
 Practical copy/paste and navigation tests passed in **Firefox and Chrome**, each with **Violentmonkey and Tampermonkey**. Firefox + Violentmonkey is the primary combination. See [test coverage](docs/TESTING.md) for versions and limits.
 
-Standalone console windows, noVNC/SPICE, PDM remote consoles, and custom proxy ports are outside the supported scope. Other browsers and managers are outside the current testing focus; see [compatibility details](docs/COMPATIBILITY.md).
+Standalone console windows, noVNC/SPICE, PDM remote consoles, and custom proxy ports are outside the supported scope. Other browsers and managers are outside the current testing focus; see [compatibility details](docs/TESTING.md#current-status).
 
 ## Documentation
 
 - [Testing and troubleshooting](docs/TESTING.md) — local checks, diagnostic probes, and live test results.
 - [Design](docs/DESIGN.md) — console matching, text extraction, and clipboard handling.
-- [Changelog](CHANGELOG.md) and [project history](docs/HISTORY.md) — releases and earlier behavior.
-- [Decisions](DECISIONS.md) and [open loops](docs/OPEN-LOOPS.md) — scope, follow-ups, and contribution ideas.
+- [Open loops](docs/OPEN-LOOPS.md) — remaining evidence gaps and conditional follow-ups.
+- [Documentation index](docs/README.md) — decisions, changelog, and historical records.
 
 [MIT License](LICENSE).

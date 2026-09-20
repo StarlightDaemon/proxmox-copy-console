@@ -10,10 +10,11 @@
 - `README.md` — user-facing project overview.
 - `CHANGELOG.md` — version/baseline record.
 - `DECISIONS.md` — durable design decisions.
-- `docs/HISTORY.md` — documented project lineage.
+- `docs/README.md` — current documentation index.
+- `docs/historicals/` — preserved project lineage, earlier designs, reviews, research, and test records; status statements are historical.
 - `docs/DESIGN.md` — implementation design represented by the source.
-- `docs/TESTING.md` — verification scenarios and evidence boundaries.
-- `docs/OPEN-LOOPS.md` — follow-up register, completion criteria, and bounded agent handoff.
+- `docs/TESTING.md` — current compatibility, verification scenarios, troubleshooting, and evidence boundaries.
+- `docs/OPEN-LOOPS.md` — current follow-up register and completion criteria; completed handoffs are archived.
 - `LICENSE` — licensing terms.
 
 ## Mutation discipline
