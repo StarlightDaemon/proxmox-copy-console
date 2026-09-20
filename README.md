@@ -10,7 +10,7 @@ A lightweight userscript that adds a native **Copy** button to embedded Proxmox 
 
 ## What it does
 
-This branch prepares **0.4.1** with the unchanged runtime of live-tested 0.4.1-dev.1. The maintainer reports successful practical tests in Firefox and Chrome, each with Violentmonkey and Tampermonkey. Firefox + Violentmonkey is the primary daily-use combination. See [Testing](docs/TESTING.md) for evidence limits; main remains 0.4.0 until promotion.
+**Version 0.4.1** is the stable source on main, with the unchanged runtime of live-tested 0.4.1-dev.1. The maintainer reports successful practical tests in Firefox and Chrome, each with Violentmonkey and Tampermonkey. Firefox + Violentmonkey is the primary daily-use combination. See [Testing](docs/TESTING.md) for evidence limits.
 
 - Places one genuine ExtJS **Copy** button after the native Shell or Console control; Proxmox owns its appearance and layout.
 - Copies retained normal-buffer scrollback, or the active alternate screen used by applications such as `top`, `nano`, and `less`.
@@ -23,7 +23,7 @@ This is a snapshot of retained rendered terminal text, not a lossless session re
 
 ## Installation and trust
 
-1. For release review, open the [prepared 0.4.1 script](proxmox-copy-console.user.js). For daily use, retain [stable 0.4.0](https://github.com/StarlightDaemon/proxmox-copy-console/blob/main/proxmox-copy-console.user.js). The historical [0.3.0 baseline](https://github.com/StarlightDaemon/proxmox-copy-console/blob/27a83d2ac836ef35c2f7e6644b6e448355631be0/proxmox-copy-console.user.js) remains available.
+1. Open the [stable 0.4.1 installation link](https://raw.githubusercontent.com/StarlightDaemon/proxmox-copy-console/main/proxmox-copy-console.user.js). The previous [0.4.0 source](https://github.com/StarlightDaemon/proxmox-copy-console/blob/0413765bcf1cd0aa09db4e60667bf9e034071ce6/proxmox-copy-console.user.js) remains available. The historical [0.3.0 baseline](https://github.com/StarlightDaemon/proxmox-copy-console/blob/27a83d2ac836ef35c2f7e6644b6e448355631be0/proxmox-copy-console.user.js) remains available.
 2. Import or paste it into your userscript manager. Keep only one version enabled.
 3. **Restrict its include rules to your trusted Proxmox hosts.** The supplied `https://*:8006/*` glob covers every HTTPS host on port 8006; the script also checks the actual protocol and port. Replace that broad rule, or disable it in your manager's overrides; adding a narrow rule alongside it does not narrow access. For example, use `https://pve.example.net:8006/*` or `https://192.0.2.10:8006/*`, replacing the example with your own host. Verify the manager's effective rules. The historical 0.3.0 source uses a regex include instead.
 4. Enable the script, open `https://<your-host>:8006/`, and enter a node Shell or LXC Console.

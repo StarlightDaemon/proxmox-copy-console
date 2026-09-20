@@ -1,6 +1,6 @@
 # Design
 
-## 0.4.1 — prepared compatibility update
+## 0.4.1 — current compatibility update
 
 Discovery counts matching anchors and checks existing buttons with local `for...of` loops. This avoids passing sandbox callbacks to page-owned array methods, which the maintainer's FireMonkey probe reports as failing. Where `exportFunction` is available alongside `cloneInto`, clone configuration data without functions, then assign separately exported handlers. Each handler still ignores page arguments and returns no privileged values or promises. Managers without `exportFunction` retain the earlier function-cloning path; failed exports remain contained without retries through another sharing API.
 

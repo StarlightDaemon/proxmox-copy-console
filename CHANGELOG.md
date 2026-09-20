@@ -1,10 +1,10 @@
 # Changelog
 
-## 0.4.1 — prepared for promotion
+## 0.4.1 — 2026-09-19
 
 - Preserve the runtime of live-tested `0.4.1-dev.1` at `6d803b0946af66c021bc9999cfdce292de750120`; only userscript version/description metadata changes for promotion.
 - Record maintainer-reported practical passes with Firefox and Chrome, each using Violentmonkey and Tampermonkey. The final Firefox/Tampermonkey candidate check closes the earlier version gap; exact versions and detailed evidence limits remain in [Testing](docs/TESTING.md).
-- Focus ongoing acceptance on those four combinations. Keep additional managers deferred and unrelated PVE browser notices outside the script's scope. Main remains 0.4.0 until promotion; no tag or GitHub Release is published by this preparation.
+- Focus ongoing acceptance on those four combinations. Keep additional managers deferred and unrelated PVE browser notices outside the script's scope. Promoted to main after maintainer review and explicit approval. Tag/GitHub Release publication is separate from this source promotion.
 
 ## Earlier development — 0.4.1-dev.1
 

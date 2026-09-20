@@ -6,7 +6,7 @@
 
 ## Authoritative project documents
 
-- `proxmox-copy-console.user.js` — prepared 0.4.1, preserving the live-tested 0.4.1-dev.1 runtime; stable main retains 0.4.0 until promotion. Preserve the evidence limits in Testing.
+- `proxmox-copy-console.user.js` — stable 0.4.1 on main, preserving the live-tested 0.4.1-dev.1 runtime after maintainer-approved promotion. Preserve the evidence limits in Testing.
 - `README.md` — user-facing project overview.
 - `CHANGELOG.md` — version/baseline record.
 - `DECISIONS.md` — durable design decisions.

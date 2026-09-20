@@ -33,7 +33,7 @@ Six manager families produce **nine browser/manager combinations** to investigat
 
 ## One script, small compatibility adapters
 
-Prepared **0.4.1** preserves the tested 0.4.1-dev.1 runtime: local loops replace page-array callbacks, and configuration cloning is separate from function export where `exportFunction` exists. All four primary browser/manager combinations have maintainer-reported practical passes. Main remains 0.4.0 until promotion; the adapter description below records the retained foundation.
+Stable **0.4.1** preserves the tested 0.4.1-dev.1 runtime: local loops replace page-array callbacks, and configuration cloning is separate from function export where `exportFunction` exists. All four primary browser/manager combinations have maintainer-reported practical passes. The adapter description below records the retained 0.4.0 foundation.
 
 Version `0.4.0`, promoted from the unchanged `0.4.0-dev.2` runtime, keeps one installable source:
 
