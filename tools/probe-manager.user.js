@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Proxmox Copy Console - manager probe
 // @namespace    homelab
-// @version      0.4.1-dev.1
+// @version      0.4.1
 // @description  Temporary capability and integration checks. No UI changes, clipboard calls, or terminal text.
 // @include      https://*:8006/*
 // @grant        GM_setClipboard

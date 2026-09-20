@@ -1,12 +1,20 @@
 # Testing
 
-## Candidate: 0.4.1-dev.1
+## 0.4.1 promotion preparation
+
+The maintainer completed the remaining Firefox + Tampermonkey candidate check, reporting that the latest development build works without issues and that they ran all requested tests. This reply follows the explicit request for that pairing on 0.4.1-dev.1; record it as a maintainer-reported practical pass. No new version screenshot, per-scenario output, or probe report accompanied it, so do not invent refreshed browser/manager versions or independent clipboard verification. Together with the earlier results below, all four primary combinations now have practical workflow acceptance on the candidate. Further extended-manager testing is deferred by maintainer preference.
+
+Version 0.4.1 is prepared on the compatibility branch with its runtime unchanged from pinned candidate `6d803b0946af66c021bc9999cfdce292de750120`. Main remains 0.4.0 until promotion. Full edge-case evidence and numeric Chrome/manager versions remain separate follow-up, not a reason to repeat the accepted practical campaign or require new probes without a failure.
+
+Preparation checks on 2026-09-19: all **88 tests passed**, with zero failures/skips, after `node tools/fetch-xterm.cjs` verified the cached pinned fixture. `node tools/check.cjs` passed syntax, metadata, version, size, and local-link checks; `git diff --check` passed. Direct comparison of the runtime after the metadata header with `6d803b0` is identical with line endings normalized. Prepared source: **18,210 bytes**, SHA-256 `16dd12bbdf8a33e4336caee17f86ff1146bf183f57370abcd4632da553757b11`. These are local checks, separate from the maintainer's live reports and earlier candidate CI.
+
+## Tested candidate: 0.4.1-dev.1
 
 Branch `codex/firemonkey-compat` starts at `0413765bcf1cd0aa09db4e60667bf9e034071ce6`. The candidate uses local discovery loops and separate function exports to address the live FireMonkey failures recorded below. Stable 0.4.0 remains on main. The maintainer reports successful copying in FireMonkey and a successful primary Firefox/Violentmonkey workflow regression. Broader candidate qualification remains pending.
 
 Local verification on 2026-09-19: `node tools/check.cjs`, `node tools/fetch-xterm.cjs` (cached pinned fixture verified), `node --test --test-isolation=none tests/*.test.cjs` (**88 passed, zero failures/skips**), and `git diff --check` passed. The three new compatibility regressions cover rejected page-array callbacks, explicit function exports with no privileged return values, and contained export failure. Candidate source is **18,224 bytes**, SHA-256 `d170fb0e7156ede5120ece560404891d9fb3180eba57e7600b1d6d708457b6ff`. Mocks check our contracts, not native Firefox compartments or real clipboard behavior.
 
-Next live check: the outstanding Firefox + Tampermonkey candidate regression. Both primary Chrome managers now have maintainer-reported workflow passes below; exact version strings and full scenario qualification remain pending. Keep one manager enabled at a time and preserve trusted-host restrictions. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
+The final Firefox + Tampermonkey candidate regression is recorded above. Both primary Chrome managers have maintainer-reported workflow passes below; exact version strings and full scenario qualification remain separate evidence follow-up. Keep one manager enabled at a time and preserve trusted-host restrictions. Chromium derivatives remain expected-compatible but unverified, without a routine broad test matrix.
 
 [GitHub Actions passed for candidate commit 6d803b0](https://github.com/StarlightDaemon/proxmox-copy-console/actions/runs/35427181257). This is automated validation, not live acceptance.
 

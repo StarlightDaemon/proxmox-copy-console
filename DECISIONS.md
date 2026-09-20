@@ -56,7 +56,7 @@ These choices were implemented in 0.4.0-dev.2 and promoted without runtime chang
 
 ### Compatibility test scope clarified 2026-09-19
 
-Keep a shared source where small, evidenced compatibility changes suffice. Offer generated manager-specific variants only if shared behavior cannot remain reliable and lean; separate editions need their own acceptance. The unreleased 0.4.1-dev.1 candidate addresses FireMonkey callback boundaries without requiring a manager fork. Its Firefox + Violentmonkey workflow regression is recorded in Testing.
+Keep a shared source where small, evidenced compatibility changes suffice. Offer generated manager-specific variants only if shared behavior cannot remain reliable and lean; separate editions need their own acceptance. Prepared 0.4.1 retains the 0.4.1-dev.1 runtime that addresses FireMonkey callback boundaries without requiring a manager fork. Practical passes for all four primary browser/manager combinations are recorded in Testing; promotion does not imply full edge-case qualification.
 
 Use Chrome as the representative Chromium test browser. Other Chromium browsers are expected-compatible by maintainer policy, with no routine broad test matrix, but remain unverified unless actually exercised. Investigate a derivative browser when a concrete report warrants it. Both primary Chrome managers now have operator-reported candidate workflow passes; preserve their evidence limits in Testing.
 

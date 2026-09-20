@@ -1,6 +1,6 @@
 # Proxmox Copy Console
 
-[![Version](https://img.shields.io/badge/version-0.4.1--dev.1-0969da)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.1-0969da)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-2da44e)](LICENSE)
 
 A lightweight userscript that adds a native **Copy** button to embedded Proxmox node Shell and LXC xterm consoles. It copies the **full retained terminal buffer**, including scrollback, with wrapped rows reconstructed into logical lines.
@@ -10,7 +10,7 @@ A lightweight userscript that adds a native **Copy** button to embedded Proxmox 
 
 ## What it does
 
-This branch contains **0.4.1-dev.1**, an unreleased FireMonkey compatibility candidate. It replaces page-array callbacks with local loops and exports callbacks separately when Firefox's `exportFunction` is available. Live acceptance is pending; [main's stable 0.4.0 source](https://github.com/StarlightDaemon/proxmox-copy-console/blob/main/proxmox-copy-console.user.js) remains unchanged. Firefox + Violentmonkey is the primary daily-use combination and must be rechecked before promotion.
+This branch prepares **0.4.1** with the unchanged runtime of live-tested 0.4.1-dev.1. The maintainer reports successful practical tests in Firefox and Chrome, each with Violentmonkey and Tampermonkey. Firefox + Violentmonkey is the primary daily-use combination. See [Testing](docs/TESTING.md) for evidence limits; main remains 0.4.0 until promotion.
 
 - Places one genuine ExtJS **Copy** button after the native Shell or Console control; Proxmox owns its appearance and layout.
 - Copies retained normal-buffer scrollback, or the active alternate screen used by applications such as `top`, `nano`, and `less`.
@@ -23,7 +23,7 @@ This is a snapshot of retained rendered terminal text, not a lossless session re
 
 ## Installation and trust
 
-1. For this development test, open the [0.4.1-dev.1 candidate](proxmox-copy-console.user.js). For daily use, retain [stable 0.4.0](https://github.com/StarlightDaemon/proxmox-copy-console/blob/main/proxmox-copy-console.user.js). The historical [0.3.0 baseline](https://github.com/StarlightDaemon/proxmox-copy-console/blob/27a83d2ac836ef35c2f7e6644b6e448355631be0/proxmox-copy-console.user.js) remains available.
+1. For release review, open the [prepared 0.4.1 script](proxmox-copy-console.user.js). For daily use, retain [stable 0.4.0](https://github.com/StarlightDaemon/proxmox-copy-console/blob/main/proxmox-copy-console.user.js). The historical [0.3.0 baseline](https://github.com/StarlightDaemon/proxmox-copy-console/blob/27a83d2ac836ef35c2f7e6644b6e448355631be0/proxmox-copy-console.user.js) remains available.
 2. Import or paste it into your userscript manager. Keep only one version enabled.
 3. **Restrict its include rules to your trusted Proxmox hosts.** The supplied `https://*:8006/*` glob covers every HTTPS host on port 8006; the script also checks the actual protocol and port. Replace that broad rule, or disable it in your manager's overrides; adding a narrow rule alongside it does not narrow access. For example, use `https://pve.example.net:8006/*` or `https://192.0.2.10:8006/*`, replacing the example with your own host. Verify the manager's effective rules. The historical 0.3.0 source uses a regex include instead.
 4. Enable the script, open `https://<your-host>:8006/`, and enter a node Shell or LXC Console.
@@ -32,7 +32,7 @@ Grants are `GM_setClipboard` / `GM.setClipboard` (alternative clipboard API styl
 
 The target is the **main Proxmox UI with embedded same-origin xterm frames**. Standalone console windows, reverse proxies on other ports, PDM remote consoles, noVNC/SPICE, and other guest console types are outside the established scope.
 
-Target **current stable Proxmox VE, with Firefox as the primary browser and Chrome as the secondary compatibility target**. Tampermonkey and Violentmonkey are the primary manager targets; Greasemonkey, FireMonkey, ScriptCat, and OrangeMonkey are additional candidates. The shared script includes legacy/modern clipboard APIs and a Firefox object-sharing adapter. See the [ten-app survey and compatibility matrix](docs/COMPATIBILITY.md) for sources, installation notes, and qualification status. Promotion follows the maintainer's reported workflow acceptance, not completion of every matrix row. No separate manager-specific source forks are currently needed.
+Target **current stable Proxmox VE, with Firefox as the primary browser and Chrome as the secondary compatibility target**. Tampermonkey and Violentmonkey are the active manager targets. Further testing of additional managers is deferred; existing results are retained. The shared script includes legacy/modern clipboard APIs and a Firefox object-sharing adapter. See the [ten-app survey and compatibility matrix](docs/COMPATIBILITY.md) for sources, installation notes, and qualification status. Promotion follows the maintainer's reported workflow acceptance, not completion of every matrix row. No separate manager-specific source forks are currently needed.
 
 ## Usage
 

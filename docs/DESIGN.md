@@ -1,12 +1,12 @@
 # Design
 
-## 0.4.1-dev.1 — unreleased compatibility candidate
+## 0.4.1 — prepared compatibility update
 
 Discovery counts matching anchors and checks existing buttons with local `for...of` loops. This avoids passing sandbox callbacks to page-owned array methods, which the maintainer's FireMonkey probe reports as failing. Where `exportFunction` is available alongside `cloneInto`, clone configuration data without functions, then assign separately exported handlers. Each handler still ignores page arguments and returns no privileged values or promises. Managers without `exportFunction` retain the earlier function-cloning path; failed exports remain contained without retries through another sharing API.
 
-Firefox documents the [separate function-export API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts), and [FireMonkey 3.8 exposes it](https://github.com/erosman/firemonkey/blob/e91aa324284a495e0d819b1efe6203e48c868369/src/content/api.js). This is a candidate response to observed callback failures, not a claim of successful native execution. All text extraction, ownership rules, clipboard semantics, permissions, and timing remain as described for 0.4.0 below.
+Firefox documents the [separate function-export API](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts), and [FireMonkey 3.8 exposes it](https://github.com/erosman/firemonkey/blob/e91aa324284a495e0d819b1efe6203e48c868369/src/content/api.js). Version 0.4.1 preserves this runtime from 0.4.1-dev.1 after maintainer-reported practical acceptance; see [Testing](TESTING.md) for actual coverage and limits. All text extraction, ownership rules, clipboard semantics, permissions, and timing remain as described for 0.4.0 below.
 
-## 0.4.0 — current implementation
+## 0.4.0 — retained implementation foundation
 
 Version 0.4.0 promotes the runtime from 0.4.0-dev.2 without behavior changes, following the maintainer's live copy/paste report. [Testing](TESTING.md) records the scope and limits of that acceptance. The 0.3.0 design is retained below and its source remains pinned at `27a83d2ac836ef35c2f7e6644b6e448355631be0`.
 

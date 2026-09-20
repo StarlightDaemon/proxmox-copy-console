@@ -33,7 +33,7 @@ Six manager families produce **nine browser/manager combinations** to investigat
 
 ## One script, small compatibility adapters
 
-This branch's unreleased **0.4.1-dev.1** candidate replaces page-array callbacks with local loops and separates configuration cloning from function export where `exportFunction` exists. The remaining 0.4.0 adapter description below records stable behavior; candidate live acceptance is pending. Recheck Firefox + Violentmonkey before promotion.
+Prepared **0.4.1** preserves the tested 0.4.1-dev.1 runtime: local loops replace page-array callbacks, and configuration cloning is separate from function export where `exportFunction` exists. All four primary browser/manager combinations have maintainer-reported practical passes. Main remains 0.4.0 until promotion; the adapter description below records the retained foundation.
 
 Version `0.4.0`, promoted from the unchanged `0.4.0-dev.2` runtime, keeps one installable source:
 
@@ -56,7 +56,7 @@ Then use the [page structure probe](../tools/probe-console.js) in top-page devto
 
 Reported passes in the Firefox 156.0 (64-bit) / Proxmox VE 9.2.3 test round: **Violentmonkey 2.49.0** and **Tampermonkey 5.5.0**, both using script **0.4.0-dev.2**. Screenshots establish version details; the maintainer reports successful copy/paste across nodes and LXC consoles with Violentmonkey, and fully tested/working with no issues under Tampermonkey. See Testing for the evidence boundaries and unrecorded scenario details.
 
-Current test round (maintainer preference, 2026-09-19): **operator-run Chrome testing** after canceling the computer-control attempt. Chrome + Tampermonkey and Chrome + Violentmonkey both have reported candidate workflow passes. Chrome is reported as the latest official public-channel build; exact browser/manager versions remain pending. Preserve the earlier Firefox results separately; Firefox + Tampermonkey still needs a candidate regression, and ScriptCat remains a future check.
+Current test round (maintainer preference, 2026-09-19): **operator-run Chrome testing** after canceling the computer-control attempt. Chrome + Tampermonkey and Chrome + Violentmonkey both have reported candidate workflow passes. Chrome is reported as the latest official public-channel build; exact browser/manager versions remain pending. Preserve the earlier Firefox results separately; The final Firefox + Tampermonkey candidate regression is now reported successful; additional-manager testing is deferred.
 
 For each manager, keep the same script version and benign output, enable only one manager/script installation for the Proxmox site at a time, and apply the same trusted-host restrictions. Run this short workflow check first:
 
@@ -68,7 +68,7 @@ For each manager, keep the same script version and benign output, enable only on
 
 | Priority | Combination | Status |
 | --- | --- | --- |
-| 1 | Firefox stable + Tampermonkey stable | Pass, maintainer-reported: Tampermonkey 5.5.0 with script 0.4.0-dev.2 in the Firefox test round; fully tested and working, no issues reported |
+| 1 | Firefox stable + Tampermonkey stable | Workflow passed on dev.2 and candidate 0.4.1-dev.1. In response to the final Firefox/Tampermonkey check, the maintainer reports running all requested tests without issues. Earlier screenshot: Tampermonkey 5.5.0; final run versions were not independently restated |
 | 1 | Firefox stable + Violentmonkey stable | Workflow passed on dev.2 and candidate 0.4.1-dev.1: maintainer reports shell/container copying and dynamic switching work without issues. Established environment: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; full scenario qualification pending |
 | 2 | Firefox stable + Greasemonkey stable | Functional pass, maintainer-reported: Greasemonkey 4.14 with candidate 0.4.1-dev.1 in the Firefox test round. Recurring UI exceptions coexist with working copying and also occurred in the earlier scripts-disabled profile; cause and full scenario qualification remain open |
 | 2 | Firefox stable + FireMonkey stable | Stable workflow failed: 3.8 shows no Copy button. Candidate 0.4.1-dev.1: maintainer reports Copy worked with probe disabled. ExtJS fireFn/timerId and loadTags errors also appear in the supplied scripts-disabled baseline; candidate-specific cause not established. Full scenario qualification pending; popup port-matching issue remains separate |

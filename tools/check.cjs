@@ -6,7 +6,7 @@ const { createHash } = require('node:crypto');
 const root = path.join(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'proxmox-copy-console.user.js'), 'utf8');
 const version = source.match(/^\/\/ @version\s+(\S+)$/m)?.[1];
-assert.equal(version, '0.4.1-dev.1', 'Update version checks intentionally when preparing a release');
+assert.equal(version, '0.4.1', 'Update version checks intentionally when preparing a release');
 assert.ok(Buffer.byteLength(source) <= 20 * 1024, 'Review runtime growth before raising the 20 KiB budget');
 assert.deepEqual([...source.matchAll(/^\/\/ @grant\s+(\S+)$/gm)].map(m => m[1]).sort(),
     ['GM.info', 'GM.setClipboard', 'GM_info', 'GM_setClipboard', 'unsafeWindow']);

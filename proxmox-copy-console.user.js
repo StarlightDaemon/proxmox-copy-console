@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Proxmox Copy Console
 // @namespace    homelab
-// @version      0.4.1-dev.1
-// @description  Development candidate: FireMonkey callback compatibility for Proxmox console copying.
+// @version      0.4.1
+// @description  Copy retained Proxmox node Shell and LXC console text with one native button.
 // @include      https://*:8006/*
 // @grant        GM_setClipboard
 // @grant        GM_info
