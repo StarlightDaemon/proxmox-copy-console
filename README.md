@@ -5,7 +5,7 @@
 
 Copy text from Proxmox node shells and LXC consoles with one native **Copy** button. This lightweight userscript captures retained scrollback, joins wrapped lines, and follows the console as you switch between nodes and containers.
 
-**[Install the stable script](https://raw.githubusercontent.com/StarlightDaemon/proxmox-copy-console/main/proxmox-copy-console.user.js)** · [Release notes](https://github.com/StarlightDaemon/proxmox-copy-console/releases/latest)
+**[Install by copy and paste](#install)** · [Stable source code](https://github.com/StarlightDaemon/proxmox-copy-console/blob/main/proxmox-copy-console.user.js) · [Release notes](https://github.com/StarlightDaemon/proxmox-copy-console/releases/latest)
 
 ## What it copies
 
@@ -19,10 +19,20 @@ One JavaScript file, with no build step or runtime dependencies. The script make
 
 ## Install
 
+Copy and paste directly into your chosen manager. This avoids raw-script links being opened by another extension, such as AdGuard.
+
 1. Install **Violentmonkey** or **Tampermonkey** in Firefox or Chrome.
-2. Open the [stable script](https://raw.githubusercontent.com/StarlightDaemon/proxmox-copy-console/main/proxmox-copy-console.user.js) and install it through your manager. If no installation prompt appears, import the file or paste its contents into a new script.
-3. **Replace** the supplied `https://*:8006/*` include rule with your trusted Proxmox host, for example `https://pve.example.net:8006/*`. Adding a narrow rule alongside the broad one does not restrict access.
-4. Keep one copy enabled in one manager, reload Proxmox, and open a node **Shell** or LXC **Console**.
+2. Open the [stable source code on GitHub](https://github.com/StarlightDaemon/proxmox-copy-console/blob/main/proxmox-copy-console.user.js). Use the **Copy raw file** button above the code to copy the entire file, including its `// ==UserScript==` header. Do not click **Raw** or copy the whole web page.
+3. Create a script using the manager instructions below. Select all of the editor's starter code and **replace it** with the copied script.
+4. **Replace** the supplied `https://*:8006/*` include rule with your trusted Proxmox host, for example `https://pve.example.net:8006/*`. Adding a narrow rule alongside the broad one does not restrict access.
+5. Save, keep one copy enabled in one manager, reload Proxmox, and open a node **Shell** or LXC **Console**.
+
+| Manager | Open its script editor |
+| --- | --- |
+| [Violentmonkey](https://violentmonkey.github.io/guide/creating-a-userscript/) | Click its toolbar icon, then **+** to create a new script. |
+| [Tampermonkey](https://www.tampermonkey.net/faq.php?locale=en&q=Q102) | Open its dashboard and choose **Add a new script**. |
+
+For updates, replace the code in your existing script entry and reapply your trusted-host include rule before saving.
 
 The script needs access to the Proxmox page and permission to write to the clipboard. Only enable it on hosts you trust. Copied scrollback may contain sensitive output; check it before sharing.
 
