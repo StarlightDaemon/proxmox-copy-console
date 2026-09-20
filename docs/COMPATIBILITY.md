@@ -12,6 +12,8 @@ This is a rolling target, not a promise that an untested future release works. R
 
 ## Ten-app survey
 
+Historical survey, not an active test queue: after the primary Chrome workflow passes on 2026-09-19, the maintainer deferred further testing outside Firefox/Chrome with Violentmonkey/Tampermonkey. Existing extended-manager results remain valid within their recorded limits. Revisit additional managers only on request or for a demonstrated copying issue.
+
 There is no verified cross-store top-ten ranking. The survey below prioritizes full userscript managers and separately records adjacent injectors and a Safari-only manager. Store counts are rounded, store-specific snapshots observed on 2026-09-18, not total users, security endorsements, or proof of compatibility. A dash means no comparable count was recorded. Browser columns describe publisher offerings; the [maintainer's live workflow report](TESTING.md#maintainer-live-acceptance--2026-09-18) covers Firefox 156.0 (64-bit) with Violentmonkey 2.49.0 on Proxmox VE 9.2.3. The corresponding matrix row records this workflow pass without claiming full scenario coverage.
 
 | App and primary source | Chrome | Firefox | Observed adoption signal | Project disposition |
@@ -70,7 +72,7 @@ For each manager, keep the same script version and benign output, enable only on
 | 1 | Firefox stable + Violentmonkey stable | Workflow passed on dev.2 and candidate 0.4.1-dev.1: maintainer reports shell/container copying and dynamic switching work without issues. Established environment: Firefox 156.0 (64-bit), Violentmonkey 2.49.0, Proxmox VE 9.2.3; full scenario qualification pending |
 | 2 | Firefox stable + Greasemonkey stable | Functional pass, maintainer-reported: Greasemonkey 4.14 with candidate 0.4.1-dev.1 in the Firefox test round. Recurring UI exceptions coexist with working copying and also occurred in the earlier scripts-disabled profile; cause and full scenario qualification remain open |
 | 2 | Firefox stable + FireMonkey stable | Stable workflow failed: 3.8 shows no Copy button. Candidate 0.4.1-dev.1: maintainer reports Copy worked with probe disabled. ExtJS fireFn/timerId and loadTags errors also appear in the supplied scripts-disabled baseline; candidate-specific cause not established. Full scenario qualification pending; popup port-matching issue remains separate |
-| 2 | Firefox stable + ScriptCat stable | Next Firefox round |
+| 2 | Firefox stable + ScriptCat stable | Deferred by maintainer; no additional-manager testing currently planned |
 | 3 | Chrome stable + Tampermonkey stable | Workflow passed, maintainer-reported: candidate 0.4.1-dev.1 Copy button, menu navigation, and leaving/returning to the site worked with no observed functional issues. Exact Chrome/manager versions and full scenario qualification pending; see Testing for screenshot notices |
 | 3 | Chrome stable + Violentmonkey stable MV3 | Workflow passed, maintainer-reported: all testing with candidate 0.4.1-dev.1 went fine without issue. Latest official public-channel Chrome reported; numeric browser/manager versions, installed manifest, and full scenario qualification remain unrecorded. Same form/unload issue categories as the Tampermonkey run |
 | 4 | Chrome stable + ScriptCat stable | Deferred by maintainer for this round |

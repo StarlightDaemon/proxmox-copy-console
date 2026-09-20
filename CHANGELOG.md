@@ -4,7 +4,7 @@
 
 - Address FireMonkey's observed rejection of sandbox callbacks passed to page-owned array `filter`/`some` methods by using local loops for anchor counting and duplicate-button checks.
 - When available, use Firefox `exportFunction` for no-argument/no-return handlers and clone configuration data separately. Preserve the existing clone-functions path for managers without that API.
-- Keep the shared script, permissions, clipboard behavior, and installation scope. Add regression cases for strict callback boundaries and export failure containment. FireMonkey and Firefox/Violentmonkey live acceptance remain pending; stable 0.4.0 is unchanged on main.
+- Keep the shared script, permissions, clipboard behavior, and installation scope. Add regression cases for strict callback boundaries and export failure containment. Operator reports cover Firefox/Violentmonkey, Firefox/FireMonkey, Firefox/Greasemonkey, and both primary Chrome managers; preserve exact-version and scenario limits in [Testing](docs/TESTING.md). Stable 0.4.0 is unchanged on main.
 
 ## 0.4.0 — 2026-09-19
 

@@ -16,6 +16,8 @@ OL-04 latest: candidate commit `6d803b0` passed CI. The maintainer reports FireM
 
 Items are unassigned unless an owner is recorded below. Claim one ID with an agent/task reference and starting commit before editing. Keep status and evidence with that ID; mark it done only when its completion criterion is met. Conditional items and ideas are not queued implementation work. Record failures and unavailable environments honestly.
 
+Maintainer scope update after both Chrome passes: stop additional-manager testing for now. Active practical acceptance focuses on Firefox/Chrome with Violentmonkey/Tampermonkey; extended portions of OL-04, including ScriptCat and more FireMonkey/Greasemonkey qualification, are deferred and do not gate release readiness. Preserve reported passes and optional diagnostic tools. Before claiming all four combinations tested on the same candidate, resolve the recorded Firefox + Tampermonkey version gap: its explicit screenshot-backed pass used 0.4.0-dev.2, while the later general acceptance does not specify a new candidate run.
+
 | ID | Priority / state | Follow-up and completion criterion |
 | --- | --- | --- |
 | OL-01 | Done / reviewed 2026-09-18 | Agent `ol01_review` completed the scoped review from `c9219895b259c91f934dcdc350f4a08db66ebae9`; originating reviewer accepted the no-runtime-change result after independent code inspection and rerunning all 82 tests. See closure evidence below. Live acceptance rows remain open. |
